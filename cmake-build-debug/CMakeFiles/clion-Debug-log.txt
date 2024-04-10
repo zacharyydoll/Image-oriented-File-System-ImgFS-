@@ -1,0 +1,4 @@
+/home/parallels/clion-2023.3.4/bin/cmake/linux/aarch64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/home/parallels/clion-2023.3.4/bin/ninja/linux/aarch64/ninja -G Ninja -S /home/parallels/cs202-24-prj-sophie-zac -B /home/parallels/cs202-24-prj-sophie-zac/cmake-build-debug
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/parallels/cs202-24-prj-sophie-zac/cmake-build-debug
