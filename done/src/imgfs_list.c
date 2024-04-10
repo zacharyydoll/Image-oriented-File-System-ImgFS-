@@ -2,20 +2,21 @@
 #include "util.h" // for TO_BE_IMPLEMENTED()
 #include "stdio.h" // for print
 
-int do_list(const struct imgfs_header *header, const struct img_metadata *metadata, int output_mode) {
-    // argument validity check
-    M_REQUIRE_NON_NULL(header);
-    M_REQUIRE_NON_NULL(metadata);
+int do_list(const struct imgfs_file *imgfs_file,
+            enum do_list_mode output_mode, char **json) {
+    //argument validity check
+    M_REQUIRE_NON_NULL(imgfs_file);
+    M_REQUIRE_NON_NULL(imgfs_file->metadata);
 
     if (output_mode == STDOUT) {
-        print_header(header);
+        print_header(&imgfs_file->header);
 
         int isEmpty = 1; // Array assumed to be empty until we find a valid entry
-        for (int i = 0; i < header->max_files; i++) {
+        for (int i = 0; i < imgfs_file->header.max_files; i++) {
             // if we have a valid entry, print it and set empty flag to false
-            if (metadata[i].is_valid) {
+            if (imgfs_file->metadata[i].is_valid) {
                 isEmpty = 0;
-                print_metadata(&metadata[i]);
+                print_metadata(&imgfs_file->metadata[i]);
             }
         }
 
@@ -25,8 +26,9 @@ int do_list(const struct imgfs_header *header, const struct img_metadata *metada
 
         return ERR_NONE;
     } else if (output_mode == JSON) {
-        TO_BE_IMPLEMENTED(); // will be implemented later on in project
-        return ERR_NOT_IMPLEMENTED;
+        //TODO : use json argument in future implementation
+        TO_BE_IMPLEMENTED();
+        return NOT_IMPLEMENTED;
     } else {
         //case where output mode is undefined
         debug_printf("Unknown output mode: %d\n", output_mode);

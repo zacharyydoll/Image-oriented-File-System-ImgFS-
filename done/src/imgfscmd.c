@@ -22,26 +22,26 @@
 //commands that need to be parsed array !!!
 // Command structure
 //Typedef for command function pointer
-typedef int (*command)(int argc, char* argv[]);
+typedef int (*command)(int argc, char *argv[]);
 
 // Struct for command mapping
 typedef struct {
-    const char* name;
+    const char *name;
     command command_function;
 } command_mapping;
 
 
 // Array of commands
 command_mapping commands[] = {
-        {"help", help},
-        {"list", do_list_cmd},
+        {"help",   help},
+        {"list",   do_list_cmd},
         {"create", do_create_cmd},
         {"delete", do_delete_cmd},
 };
 
 #define NB_COMMANDS (sizeof(commands) / sizeof(command_mapping))
-int main(int argc, char* argv[])
-{
+
+int main(int argc, char *argv[]) {
     int ret = 0;
 
     if (argc < 2) {
@@ -65,7 +65,8 @@ int main(int argc, char* argv[])
             ret = ERR_INVALID_COMMAND;
         }
 
-        argc--; argv++; // skips command call name
+        argc--;
+        argv++; // skips command call name
     }
 
     if (ret) {

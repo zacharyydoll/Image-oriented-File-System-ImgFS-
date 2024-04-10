@@ -15,7 +15,7 @@
 
 // default values
 static const uint32_t default_max_files = 128;
-static const uint16_t default_thumb_res =  64;
+static const uint16_t default_thumb_res = 64;
 static const uint16_t default_small_res = 256;
 
 // max values
@@ -25,8 +25,7 @@ static const uint16_t MAX_SMALL_RES = 512;
 /**********************************************************************
  * Displays some explanations.
  ********************************************************************** */
-int help(int useless _unused, char** useless_too _unused)
-{
+int help(int useless _unused, char **useless_too _unused) {
     /* **********************************************************************
      * TODO WEEK 08: WRITE YOUR CODE HERE.
      * **********************************************************************
@@ -39,7 +38,7 @@ int help(int useless _unused, char** useless_too _unused)
 /**********************************************************************
  * Opens imgFS file and calls do_list().
  ********************************************************************** */
-int do_list_cmd(int argc, char** argv) {
+int do_list_cmd(int argc, char **argv) {
     M_REQUIRE_NON_NULL(argv);
     //argc should contain program name, list command, and exactly one filename
     if (argc != 3)
@@ -68,8 +67,7 @@ int do_list_cmd(int argc, char** argv) {
 /**********************************************************************
  * Prepares and calls do_create command.
 ********************************************************************** */
-int do_create_cmd(int argc, char** argv)
-{
+int do_create_cmd(int argc, char **argv) {
 
     puts("Create");
     /* **********************************************************************
@@ -84,8 +82,7 @@ int do_create_cmd(int argc, char** argv)
 /**********************************************************************
  * Deletes an image from the imgFS.
  */
-int do_delete_cmd(int argc, char** argv)
-{
+int do_delete_cmd(int argc, char **argv) {
     /* **********************************************************************
      * TODO WEEK 08: WRITE YOUR CODE HERE (and change the return if needed).
      * **********************************************************************
