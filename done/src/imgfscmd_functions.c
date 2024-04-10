@@ -39,16 +39,28 @@ int help(int useless _unused, char** useless_too _unused)
 /**********************************************************************
  * Opens imgFS file and calls do_list().
  ********************************************************************** */
-int do_list_cmd(int argc, char** argv)
-{
-    /* **********************************************************************
-     * TODO WEEK 07: WRITE YOUR CODE HERE.
-     * **********************************************************************
-     */
+int do_list_cmd(int argc, char** argv) {
+    M_REQUIRE_NON_NULL(argv);
+    //argc should contain program name, list command, and exactly one filename
+    if (argc != 3)
+        return ERR_INVALID_COMMAND;
 
+    imgfs_file imgfsFile; // initialize structure
+    memset(&imgfsFile, 0, sizeof(imgfsFile)); //make sure all bytes are set to 0
 
-    imgfs_file imgfsFile = {0}; // initialize structure
-    imgfsFile.file =
+    //Open
+    int open_ret = do_open(argv[2], "rb", &imgfsFile); // rb because no modifications
+    if (open_ret != ERR_NONE) return open_ret; //return ERR_IO or ERR_OUT_OF_MEMORY if file can't be opened
+
+    //Display
+    int list_ret = do_list(&imgfs, STDOUT, NULL);
+    if (list_ret != ERR_NONE) {
+        do_close(&imgfs);  // close the file before returning
+        return list_ret;
+    }
+
+    //Close
+    do_close(&imgfsFile);
 
     return ERR_NONE;
 }
