@@ -49,42 +49,40 @@ extern "C" {
  * **********************************************************************
  */
 
-typedef struct imgfs_header{
-    char name[MAX_IMGFS_NAME] ;
+typedef struct imgfs_header {
+    char name[MAX_IMGFS_NAME];
     uint32_t version;
     uint32_t nb_files;
     uint32_t max_files;
-    uint16_t resized_res[2*(NB_RES-1)];
+    uint16_t resized_res[2 * (NB_RES - 1)];
     uint32_t unused_32;
     uint64_t unused_64;
 
-}imgfs_header;
+} imgfs_header;
+
 //---------------------------------------------------------
 
-
-typedef struct img_metadata{
+typedef struct img_metadata {
     char img_id[MAX_IMG_ID];
     uint32_t orig_res[2];
     uint32_t size[NB_RES];//X_RES ?
     uint64_t offset[NB_RES];//X_RES ?
-    uint16_t is_valid ;
+    uint16_t is_valid;
     uint16_t unused_16;
     unsigned char SHA[SHA256_DIGEST_LENGTH];
 
+} img_metadata;
 
-
-}img_metadata;
 //-------------------------------------------------------------
-typedef struct imgfs_file{
-    FILE* file;
+
+typedef struct imgfs_file {
+    FILE *file;
     struct imgfs_header header;
     struct img_metadata *metadata;
-}imgfs_file;
+
+} imgfs_file;
 
 //-------------------------------------------------------------
-
-
-
 
 
 /**
@@ -92,14 +90,14 @@ typedef struct imgfs_file{
  *
  * @param header The header to be displayed.
  */
-void print_header(const struct imgfs_header* header);
+void print_header(const struct imgfs_header *header);
 
 /**
  * @brief Prints image metadata informations.
  *
  * @param metadata The metadata of one image.
  */
-void print_metadata(const struct img_metadata* metadata);
+void print_metadata(const struct img_metadata *metadata);
 
 /**
  * @brief Open imgFS file, read the header and all the metadata.
@@ -108,16 +106,16 @@ void print_metadata(const struct img_metadata* metadata);
  * @param open_mode Mode for fopen(), eg.: "rb", "rb+", etc.
  * @param imgfs_file Structure for header, metadata and file pointer.
  */
-int do_open(const char* imgfs_filename,
-            const char* open_mode,
-            struct imgfs_file* imgfs_file);
+int do_open(const char *imgfs_filename,
+            const char *open_mode,
+            struct imgfs_file *imgfs_file);
 
 /**
  * @brief Do some clean-up for imgFS file handling.
  *
  * @param imgfs_file Structure for header, metadata and file pointer to be freed/closed.
  */
-void do_close(struct imgfs_file* imgfs_file);
+void do_close(struct imgfs_file *imgfs_file);
 
 /**
  * @brief List of possible output modes for do_list()
@@ -139,8 +137,8 @@ enum do_list_mode {
  *      It will be dynamically allocated by the function. Ignored for other output modes.
  * @return some error code.
  */
-int do_list(const struct imgfs_file* imgfs_file,
-            enum do_list_mode output_mode, char** json);
+int do_list(const struct imgfs_file *imgfs_file,
+            enum do_list_mode output_mode, char **json);
 
 /**
  * @brief Creates the imgFS called imgfs_filename. Writes the header and the
@@ -149,7 +147,7 @@ int do_list(const struct imgfs_file* imgfs_file,
  * @param imgfs_filename Path to the imgFS file
  * @param imgfs_file In memory structure with header and metadata.
  */
-int do_create(const char* imgfs_filename, struct imgfs_file* imgfs_file);
+int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file);
 
 /**
  * @brief Deletes an image from a imgFS imgFS.
@@ -163,7 +161,7 @@ int do_create(const char* imgfs_filename, struct imgfs_file* imgfs_file);
  * @param imgfs_file The main in-memory data structure
  * @return Some error code. 0 if no error.
  */
-int do_delete(const char* img_id, struct imgfs_file* imgfs_file);
+int do_delete(const char *img_id, struct imgfs_file *imgfs_file);
 
 /**
  * @brief Transforms resolution string to its int value.
@@ -172,7 +170,7 @@ int do_delete(const char* img_id, struct imgfs_file* imgfs_file);
  *        "orig", "thumbnail", "thumb" or "small".
  * @return The corresponding value or -1 if error.
  */
-int resolution_atoi(const char* resolution);
+int resolution_atoi(const char *resolution);
 
 /**
  * @brief Reads the content of an image from a imgFS.
@@ -184,8 +182,8 @@ int resolution_atoi(const char* resolution);
  * @param imgfs_file The main in-memory data structure
  * @return Some error code. 0 if no error.
  */
-int do_read(const char* img_id, int resolution, char** image_buffer,
-            uint32_t* image_size, struct imgfs_file* imgfs_file);
+int do_read(const char *img_id, int resolution, char **image_buffer,
+            uint32_t *image_size, struct imgfs_file *imgfs_file);
 
 /**
  * @brief Insert image in the imgFS file
@@ -195,8 +193,8 @@ int do_read(const char* img_id, int resolution, char** image_buffer,
  * @param img_id Image ID
  * @return Some error code. 0 if no error.
  */
-int do_insert(const char* image_buffer, size_t image_size,
-              const char* img_id, struct imgfs_file* imgfs_file);
+int do_insert(const char *image_buffer, size_t image_size,
+              const char *img_id, struct imgfs_file *imgfs_file);
 
 /**
  * @brief Removes the deleted images by moving the existing ones
@@ -205,7 +203,7 @@ int do_insert(const char* image_buffer, size_t image_size,
  * @param imgfs_tmp_bkp_path The path to the a (to be created) temporary imgFS backup file
  * @return Some error code. 0 if no error.
  */
-int do_gbcollect(const char* imgfs_path, const char* imgfs_tmp_bkp_path);
+int do_gbcollect(const char *imgfs_path, const char *imgfs_tmp_bkp_path);
 
 #ifdef __cplusplus
 }

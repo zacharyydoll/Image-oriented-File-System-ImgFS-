@@ -46,6 +46,10 @@ int do_list_cmd(int argc, char** argv)
      * **********************************************************************
      */
 
+
+    imgfs_file imgfsFile = {0}; // initialize structure
+    imgfsFile.file =
+
     return ERR_NONE;
 }
 
