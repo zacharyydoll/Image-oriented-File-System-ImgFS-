@@ -52,9 +52,9 @@ int do_list_cmd(int argc, char **argv) {
     if (open_ret != ERR_NONE) return open_ret; //return ERR_IO or ERR_OUT_OF_MEMORY if file can't be opened
 
     //Display
-    int list_ret = do_list(&imgfs, STDOUT, NULL);
+    int list_ret = do_list(&imgfsFile, STDOUT, NULL);
     if (list_ret != ERR_NONE) {
-        do_close(&imgfs);  // close the file before returning
+        do_close(&imgfsFile);  // close the file before returning
         return list_ret;
     }
 
