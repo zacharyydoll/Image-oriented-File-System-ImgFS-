@@ -47,11 +47,6 @@ int main(int argc, char *argv[]) {
     if (argc < 2) {
         ret = ERR_NOT_ENOUGH_ARGUMENTS;
     } else {
-        /* **********************************************************************
-         * TODO WEEK 07: THIS PART SHALL BE EXTENDED.
-         * **********************************************************************
-         */
-
         for (int i = 0; i < NB_COMMANDS; ++i) {
             if (strcmp(argv[1], commands[i].name) == 0) {
                 // Call the command function

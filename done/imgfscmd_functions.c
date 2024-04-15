@@ -26,13 +26,27 @@ static const uint16_t MAX_SMALL_RES = 512;
  * Displays some explanations.
  ********************************************************************** */
 int help(int useless _unused, char **useless_too _unused) {
-    /* **********************************************************************
-     * TODO WEEK 08: WRITE YOUR CODE HERE.
-     * **********************************************************************
-     */
-
-    TO_BE_IMPLEMENTED();
-    return NOT_IMPLEMENTED;
+    printf("imgfscmd [COMMAND] [ARGUMENTS]\n"
+           "  help: displays this help.\n"
+           "  list <imgFS_filename>: list imgFS content.\n"
+           "  create <imgFS_filename> [options]: create a new imgFS.\n"
+           "      options are:\n"
+           "          -max_files <MAX_FILES>: maximum number of files.\n"
+           "                                  default value is %u\n"
+           "                                  maximum value is 4294967295\n"
+           "          -thumb_res <X_RES> <Y_RES>: resolution for thumbnail images.\n"
+           "                                  default value is %ux%u\n"
+           "                                  maximum value is %ux%u\n"
+           "          -small_res <X_RES> <Y_RES>: resolution for small images.\n"
+           "                                  default value is %ux%u\n"
+           "                                  maximum value is %ux%u\n"
+           "  delete <imgFS_filename> <imgID>: delete image imgID from imgFS.\n",
+           default_max_files,
+           default_thumb_res, default_thumb_res,
+           MAX_THUMB_RES, MAX_THUMB_RES,
+           default_small_res, default_small_res,
+           MAX_SMALL_RES, MAX_SMALL_RES
+    );
 }
 
 /**********************************************************************
@@ -48,13 +62,13 @@ int do_list_cmd(int argc, char **argv) {
     memset(&imgfsFile, 0, sizeof(imgfsFile)); //make sure all bytes are set to 0
 
     //Open
-    int open_ret = do_open(argv[2], "rb", &imgfsFile); // rb because no modifications
-    if (open_ret != ERR_NONE) return open_ret; //return ERR_IO or ERR_OUT_OF_MEMORY if file can't be opened
+    int open_ret = do_open(argv[2], "rb", &imgfsFile);
+    if (open_ret != ERR_NONE) return open_ret;
 
     //Display
     int list_ret = do_list(&imgfsFile, STDOUT, NULL);
     if (list_ret != ERR_NONE) {
-        do_close(&imgfsFile);  // close the file before returning
+        do_close(&imgfsFile); // close the file before returning
         return list_ret;
     }
 
