@@ -7,7 +7,7 @@ int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file) {
     // Parameter validity check
     M_REQUIRE_NON_NULL(imgfs_file);
     if (imgfs_filename == NULL) {
-        return ERR_INVALID_FILENAME;
+        return ERR_INVALID_FILENAME; // See provided tests (week 8) for expected error value in this case
     }
 
     // Open the file
@@ -16,11 +16,11 @@ int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file) {
         return ERR_IO;
     }
 
-    // Finish initialization of the header (max_files and resized_res are already provided)
+    // Finish initialization of the header (max_files and resized_res are already provided, see handout)
     strncpy(imgfs_file->header.name, CAT_TXT, sizeof(imgfs_file->header.name) - 1);
-    imgfs_file->header.name[sizeof(imgfs_file->header.name) - 1] = '\0'; // Ensure null-termination
+    imgfs_file->header.name[sizeof(imgfs_file->header.name) - 1] = '\0';
     imgfs_file->header.version = 1;
-    imgfs_file->header.nb_files = 0;
+    imgfs_file->header.nb_files = 0; // no files yet
     imgfs_file->header.unused_32 = 0;
     imgfs_file->header.unused_64 = 0;
 
@@ -46,7 +46,7 @@ int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file) {
         free(imgfs_file->metadata);
         return ERR_IO;
     }
-
+    // print # of items written (see handout)
     printf("%d item(s) written\n", 1 + imgfs_file->header.nb_files); // header + each metadata entry
 
     return ERR_NONE;

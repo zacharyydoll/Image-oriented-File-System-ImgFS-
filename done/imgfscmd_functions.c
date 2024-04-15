@@ -44,7 +44,7 @@ int do_list_cmd(int argc, char **argv) {
     if (argc != 3)
         return ERR_INVALID_COMMAND;
 
-    imgfs_file imgfsFile; // initialize structure
+    imgfs_file imgfsFile = NULL; // initialize structure
     memset(&imgfsFile, 0, sizeof(imgfsFile)); //make sure all bytes are set to 0
 
     //Open
@@ -69,14 +69,77 @@ int do_list_cmd(int argc, char **argv) {
 ********************************************************************** */
 int do_create_cmd(int argc, char **argv) {
 
-    puts("Create");
-    /* **********************************************************************
-     * TODO WEEK 08: WRITE YOUR CODE HERE (and change the return if needed).
-     * **********************************************************************
-     */
+    M_REQUIRE_NON_NULL(argv);
+    if (argc < 3) {
+        // file name argument is mandatory (program name, command, file name)
+        return ERR_NOT_ENOUGH_ARGUMENTS;
+    }
+    if (argv[2] == NULL) {
+        return ERR_INVALID_FILENAME;
+    }
 
-    TO_BE_IMPLEMENTED();
-    return NOT_IMPLEMENTED;
+    const char *imgfs_filename = argv[2];
+    int max_files = default_max_files;
+    int thumb_x_res = default_thumb_res;
+    int thumb_y_res = default_thumb_res;
+    int small_x_res = default_small_res;
+    int small_y_res = default_small_res;
+
+    // first 3 arguments are mandatory
+    for (int i = 3; i < argc; ++i) {
+        char *curr = argv[i]; // current (optional) argument
+
+        if (strcmp(curr, "-max_files") == 0) {
+            // -max_files must have at least one parameter
+            if (i + 1 < argc) {
+                max_files = (uint32_t) atouint32(argv[i + 1]); // convert parameter string to integer
+
+                if (max_files == 0) {
+                    return ERR_INVALID_ARGUMENT;
+                }
+            }
+            else return ERR_NOT_ENOUGH_ARGUMENTS;
+
+        } else if (strcmp(curr, "-thumb_res") == 0) {
+            // -thumb_res must have at least two parameters
+            if (i + 2 < argc) {
+                thumb_x_res = (uint16_t) atouint16(argv[i + 1]);
+                thumb_y_res = (uint16_t) atouint16(argv[i + 2]);
+
+                if (x_res == 0 || y_res == 0 || x_res > MAX_THUMB_RES || y_res > MAX_THUMB_RES) {
+                    return ERR_RESOLUTIONS;
+                }
+            }
+            else return ERR_NOT_ENOUGH_ARGUMENTS;
+
+        } else if (strcmp(curr, "-small_res") == 0) {
+            // -small_res must have at least two parameters
+            if (i + 2 < argc) {
+                small_x_res = (uint16_t) atouint16(argv[i + 1]);
+                small_y_res = (uint16_t) atouint16(argv[i + 2]);
+
+                if (x_res == 0 || y_res == 0 || x_res > MAX_SMALL_RES || y_res > MAX_SMALL_RES) {
+                    return ERR_RESOLUTIONS;
+                }
+            }
+            else return ERR_NOT_ENOUGH_ARGUMENTS;
+
+        } else {
+            // case where optional argument is not -max_files, -thumb_res, or -small_res
+            return ERR_INVALID_ARGUMENT;
+        }
+    }
+
+    // initialize imgfs_file structure with the given parameters and call do_create to initialize rest
+    imgfs_file imgfsFile = {
+        .header = {
+            .max_files = max_files,
+            .resized_res = {thumb_x_res, thumb_y_res, small_x_res, small_y_res}
+        }
+    };
+    do_create(imgfs_filename, &imgfsFile);
+
+    return ERR_NONE;
 }
 
 /**********************************************************************

@@ -1,7 +1,7 @@
-#include "imgfs_tools.c" // for print_header() method (???) Is there no header file for imgfs_tools ?
-#include "util.h" // for TO_BE_IMPLEMENTED()
-#include "stdio.h" // for print
-
+#include "imgfs.h"  // for print_header, print_metadata
+#include "util.h"   // for TO_BE_IMPLEMENTED()
+#include "error.h"  // for ERR_NONE
+#include "stdio.h"  // for print
 
 
 int do_list(const struct imgfs_file *imgfs_file,
