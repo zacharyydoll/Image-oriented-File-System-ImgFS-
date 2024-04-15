@@ -58,8 +58,9 @@ int do_list_cmd(int argc, char **argv) {
     if (argc != 3)
         return ERR_INVALID_COMMAND;
 
-    imgfs_file imgfsFile = NULL; // initialize structure
-    memset(&imgfsFile, 0, sizeof(imgfsFile)); //make sure all bytes are set to 0
+    // initialize structure, set all bytes to 0
+    imgfs_file imgfsFile = NULL;
+    memset(&imgfsFile, 0, sizeof(imgfsFile));
 
     //Open
     int open_ret = do_open(argv[2], "rb", &imgfsFile);

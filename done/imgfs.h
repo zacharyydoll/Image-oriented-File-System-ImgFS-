@@ -44,25 +44,21 @@
 extern "C" {
 #endif
 
-/* **********************************************************************
- * TODO WEEK 07: DEFINE YOUR STRUCTS HERE.
- * **********************************************************************
- */
 
-typedef struct imgfs_header {
+
+struct imgfs_header {
     char name[MAX_IMGFS_NAME];
     uint32_t version;
     uint32_t nb_files;
     uint32_t max_files;
-    uint16_t resized_res[2 * (NB_RES - 1)];
+    uint16_t resized_res[2 * (NB_RES - 1)]; // thumb_res XY, small_res XY
     uint32_t unused_32;
     uint64_t unused_64;
-
-} imgfs_header;
+};
 
 //---------------------------------------------------------
 
-typedef struct img_metadata {
+struct img_metadata {
     char img_id[MAX_IMG_ID];
     uint32_t orig_res[2];
     uint32_t size[NB_RES];   //X_RES ?
@@ -70,17 +66,15 @@ typedef struct img_metadata {
     uint16_t is_valid;
     uint16_t unused_16;
     unsigned char SHA[SHA256_DIGEST_LENGTH];
-
-} img_metadata;
+};
 
 //-------------------------------------------------------------
 
-typedef struct imgfs_file {
+struct imgfs_file {
     FILE *file;
     struct imgfs_header header;
     struct img_metadata *metadata;
-
-} imgfs_file;
+};
 
 //-------------------------------------------------------------
 

@@ -1,5 +1,4 @@
 #include "imgfs.h"
-#include "error.h"
 #include <string.h> // for strncpy
 #include <stdlib.h> // for calloc
 
