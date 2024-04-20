@@ -13,9 +13,25 @@ int do_delete(const char *img_id, struct imgfs_file *imgfs_file) {
         // find the image reference with the same name in the "metadata" and invalidate it (see handout)
         if (strncmp(imgfs_file->metadata[i].img_id, img_id, MAX_IMG_ID) == 0) {
             imgfs_file->metadata[i].is_valid = EMPTY;
+
+            //------------------------THE CHANGES-----------------------------------------------------------------------------------
+            //writing changes to disk using file functions (whole metadata for compability)
+            fseek(imgfs_file->file, sizeof(struct imgfs_header), SEEK_SET);
+            fwrite(&(imgfs_file->metadata), sizeof(struct imgfs_file), imgfs_file->header.nb_files, imgfs_file->file);
+
+            //updating header information
+            imgfs_file->header.nb_files--;
+            imgfs_file->header.version++;
+
+            //writing the header into the disk after the update
+            fseek(imgfs_file->file, 0, SEEK_SET);
+            fwrite(&(imgfs_file->header), sizeof(struct imgfs_header), 1, imgfs_file->file);
+
+            //----------------------------------------------------------------------------------------------------------------------
             return ERR_NONE;
         }
     }
+
 
     /*
      * TODO : - write changes to disk using fseek() and then fwrite()
@@ -26,5 +42,8 @@ int do_delete(const char *img_id, struct imgfs_file *imgfs_file) {
      *        - write header to disk
      */
 
-    return ERR_NOT_FOUND;
+
+
+    //case when database is not found
+    return ERR_IMAGE_NOT_FOUND;
 }

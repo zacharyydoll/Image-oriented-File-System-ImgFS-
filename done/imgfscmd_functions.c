@@ -59,7 +59,9 @@ int do_list_cmd(int argc, char **argv) {
         return ERR_INVALID_COMMAND;
 
     // initialize structure, set all bytes to 0
-    imgfs_file imgfsFile = NULL;
+    //CHANGE_SARA : changed struct imgfs_file imgfsFile = NULL to this line becasuse can't cast NULL to struct imgfs_file
+    struct imgfs_file imgfsFile ;
+
     memset(&imgfsFile, 0, sizeof(imgfsFile));
 
     //Open
@@ -121,7 +123,8 @@ int do_create_cmd(int argc, char **argv) {
                 thumb_x_res = (uint16_t) atouint16(argv[i + 1]);
                 thumb_y_res = (uint16_t) atouint16(argv[i + 2]);
 
-                if (x_res == 0 || y_res == 0 || x_res > MAX_THUMB_RES || y_res > MAX_THUMB_RES) {
+                //CHANGE_SARA : changed x_res == 0 to thumb_x_res == 0...x_res is not defined anywhere else (did the same to y_res)
+                if (thumb_x_res == 0 || thumb_y_res == 0 || thumb_x_res > MAX_THUMB_RES || thumb_y_res > MAX_THUMB_RES) {
                     return ERR_RESOLUTIONS;
                 }
             }
@@ -133,7 +136,8 @@ int do_create_cmd(int argc, char **argv) {
                 small_x_res = (uint16_t) atouint16(argv[i + 1]);
                 small_y_res = (uint16_t) atouint16(argv[i + 2]);
 
-                if (x_res == 0 || y_res == 0 || x_res > MAX_SMALL_RES || y_res > MAX_SMALL_RES) {
+                //CHANGE_SARA : changed x_res == 0 to small_x_res == 0...x_res is not defined anywhere else (did the same to y_res)
+                if (small_x_res == 0 || small_y_res == 0 || small_x_res > MAX_SMALL_RES || small_y_res > MAX_SMALL_RES) {
                     return ERR_RESOLUTIONS;
                 }
             }
@@ -145,8 +149,9 @@ int do_create_cmd(int argc, char **argv) {
         }
     }
 
+
     // initialize imgfs_file structure with the given parameters and call do_create to initialize rest
-    imgfs_file imgfsFile = {
+    struct imgfs_file imgfsFile = {
         .header = {
             .max_files = max_files,
             .resized_res = {thumb_x_res, thumb_y_res, small_x_res, small_y_res}
@@ -165,7 +170,43 @@ int do_delete_cmd(int argc, char **argv) {
      * TODO WEEK 08: WRITE YOUR CODE HERE (and change the return if needed).
      * **********************************************************************
      */
+    M_REQUIRE_NON_NULL(argv);
+    if (argc != 4) {
+        // Check if the number of arguments is correct (program name, command, imgFS filename, imgID)
+        return ERR_NOT_ENOUGH_ARGUMENTS;
+    }
 
-    TO_BE_IMPLEMENTED();
-    return NOT_IMPLEMENTED;
+    const char *imgfs_filename = argv[2];
+    const char *imgID = argv[3];
+
+
+
+    if (strlen(imgID)>MAX_IMG_ID || imgID == NULL) {
+        return ERR_INVALID_ARGUMENT;
+    }
+
+    // initializing structure and setting all bytes to 0
+    struct imgfs_file imgfsFile;
+    memset(&imgfsFile, 0, sizeof(imgfsFile));
+
+    //Open
+    int open_ret = do_open(imgfs_filename, "r+b", &imgfsFile);
+    //in case of error
+    if (open_ret != ERR_NONE) return open_ret;
+
+
+    //Delete
+    int delete_ret = do_delete(imgID, &imgfsFile);
+    if (delete_ret != ERR_NONE) {
+        do_close(&imgfsFile); // close the file before returning
+        return delete_ret;
+
+    }
+
+
+    //Close
+    do_close(&imgfsFile);
+
+
+    return ERR_NONE;
 }
