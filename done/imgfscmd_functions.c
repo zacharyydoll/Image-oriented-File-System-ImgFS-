@@ -56,12 +56,12 @@ int do_list_cmd(int argc, char **argv) {
     M_REQUIRE_NON_NULL(argv);
     //argc should contain program name, list command, and exactly one filename
 
-    //CHANGE_SARA sould != 1 instead of !=3
+    //CHANGE_SARA should != 1 instead of !=3
     if (argc != 1)
         return ERR_INVALID_COMMAND;
 
     // initialize structure, set all bytes to 0
-    //CHANGE_SARA : changed struct imgfs_file imgfsFile = NULL to this line becasuse can't cast NULL to struct imgfs_file
+    //CHANGE_SARA : changed struct imgfs_file imgfsFile = NULL to this line because can't cast NULL to struct imgfs_file
     struct imgfs_file imgfsFile ;
     memset(&imgfsFile, 0, sizeof(imgfsFile));
 
@@ -173,6 +173,8 @@ int do_delete_cmd(int argc, char **argv) {
      * **********************************************************************
      */
     M_REQUIRE_NON_NULL(argv);
+    printf("imgID: %s\n", argv[3]);
+    
     if (argc != 4) {
         // Check if the number of arguments is correct (program name, command, imgFS filename, imgID)
         return ERR_NOT_ENOUGH_ARGUMENTS;
