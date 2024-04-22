@@ -1,17 +1,26 @@
-/Applications/CLion.app/Contents/bin/cmake/mac/aarch64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/aarch64/ninja -G Ninja -S /Users/Zachary/Desktop/BA4/CompSys/cs202-24-prj-sophie-zac -B /Users/Zachary/Desktop/BA4/CompSys/cs202-24-prj-sophie-zac/cmake-build-debug
--- The C compiler identification is AppleClang 14.0.3.14030022
--- The CXX compiler identification is AppleClang 14.0.3.14030022
+/home/zachary/Downloads/clion-2023.3.4/bin/cmake/linux/aarch64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" -S /home/zachary/Desktop/cs202-24-prj-sophie-zac -B /home/zachary/Desktop/cs202-24-prj-sophie-zac/cmake-build-debug
+CMake Deprecation Warning:
+  Support for "Extra Generators" like
+
+    CodeBlocks
+
+  is deprecated and will be removed from a future version of CMake.  IDEs may
+  use the cmake-file-api(7) to view CMake-generated project build trees.
+
+
+-- The C compiler identification is GNU 12.2.0
+-- The CXX compiler identification is GNU 12.2.0
 -- Detecting C compiler ABI info
 -- Detecting C compiler ABI info - done
--- Check for working C compiler: /Library/Developer/CommandLineTools/usr/bin/cc - skipped
+-- Check for working C compiler: /usr/bin/cc - skipped
 -- Detecting C compile features
 -- Detecting C compile features - done
 -- Detecting CXX compiler ABI info
 -- Detecting CXX compiler ABI info - done
--- Check for working CXX compiler: /Library/Developer/CommandLineTools/usr/bin/c++ - skipped
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
--- Configuring done (1.3s)
+-- Configuring done (0.6s)
 CMake Error at CMakeLists.txt:9 (add_executable):
   Cannot find source file:
 

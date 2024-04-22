@@ -113,6 +113,8 @@ style:
 	astyle -n -o -A8 -xt0 *.[ch]
 
 unit-tests:
+	@echo Current Directory: $(CURDIR)
+	@echo "Test directory: $(TEST_DIR)"
 	$(MAKE) SRC_DIR=$${PWD} -B -C $(TEST_DIR)/unit
 
 test-%:

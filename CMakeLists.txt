@@ -53,5 +53,7 @@ add_executable(cs202_24_prj_sophie_zac
         provided/tests/unit/unit-test-imgfsstruct.c
         provided/tests/unit/unit-test-imgfstools.c
         done/src/main.c
+        done/tests/unit/unit-test-imgfslist.c
+        done/tests/unit/unit-test-imgfsstruct.c
 
 )
