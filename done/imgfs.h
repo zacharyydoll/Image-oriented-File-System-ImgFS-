@@ -59,13 +59,14 @@ struct imgfs_header {
 //---------------------------------------------------------
 
 struct img_metadata {
-    char img_id[MAX_IMG_ID];
+    char img_id[MAX_IMG_ID + 1]; //adding the NULL terminator
+    unsigned char SHA[SHA256_DIGEST_LENGTH];
     uint32_t orig_res[2];
     uint32_t size[NB_RES];   //X_RES ?
     uint64_t offset[NB_RES]; //X_RES ?
     uint16_t is_valid;
     uint16_t unused_16;
-    unsigned char SHA[SHA256_DIGEST_LENGTH];
+
 };
 
 //-------------------------------------------------------------

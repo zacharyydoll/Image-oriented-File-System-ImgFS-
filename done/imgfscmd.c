@@ -42,32 +42,30 @@ command_mapping commands[] = {
 #define NB_COMMANDS (sizeof(commands) / sizeof(command_mapping))
 
 int main(int argc, char *argv[]) {
-    int ret = 0;
+
 
     if (argc < 2) {
-        ret = ERR_NOT_ENOUGH_ARGUMENTS;
-    } else {
-        for (int i = 0; i < NB_COMMANDS; ++i) {
-            if (strcmp(argv[1], commands[i].name) == 0) {
-                // Call the command function
-                ret = commands[i].command_function(argc - 1, argv + 1);
-                break;
-            }
-        }
-
-        if (ret == 0) {
-            help(argc, argv);
-            ret = ERR_INVALID_COMMAND;
-        }
-
-        argc--;
-        argv++; // skips command call name
+        return ERR_NOT_ENOUGH_ARGUMENTS;
     }
 
-    if (ret) {
-        fprintf(stderr, "ERROR: %s\n", ERR_MSG(ret));
-        help(argc, argv);
+    argc--;
+    argv++; // skips command call name
+    for (int i = 0; i < NB_COMMANDS; ++i) {
+        if (strcmp(argv[0], commands[i].name) == 0) {
+            // Call the command function
+            argc--;
+            argv++;
+
+            return commands[i].command_function(argc , argv);
+
+        }
     }
 
-    return ret;
+    fprintf(stderr, "Unknown command: %s\n", argv[1]);
+
+    help(argc,argv);
+
+    return ERR_INVALID_COMMAND;
+
+
 }

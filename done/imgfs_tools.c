@@ -98,42 +98,52 @@ ORIGINAL: %"
     printf("*****************************************\n");
 }
 
-int do_open(const char *imgfs_filename, const char *open_mode, struct imgfs_file *imgfs_file) {
-    //checking the validity of a pointers given as parameters
+int do_open(const char* imgfs_filename,const char* open_mode,struct imgfs_file* imgfs_file){
+
+
+    // Check for null pointers
     M_REQUIRE_NON_NULL(imgfs_filename);
     M_REQUIRE_NON_NULL(open_mode);
     M_REQUIRE_NON_NULL(imgfs_file);
 
-    //opening the file
+
+    //Open the file
     imgfs_file->file = fopen(imgfs_filename, open_mode);
-    if (imgfs_file->file == NULL) {
-        return ERR_IO;
+    if (!imgfs_file->file) {
+        return ERR_IO; // Error file opening
     }
 
-    //reading the header
-    if (fread(&(imgfs_file->header), sizeof(imgfs_header), 1, imgfs_file->file) != 1) {
+    //Read the header
+    if (fread(&imgfs_file->header, sizeof(struct imgfs_header), 1, imgfs_file->file) != 1) {
         fclose(imgfs_file->file);
-        return ERR_IO;
+        return ERR_IO; // Error reading the header
     }
 
-    //allocating memory for the metadata
-    imgfs_file->metadata = calloc(imgfs_file->header.max_files,
-                                  sizeof(img_metadata) * imgfs_file->header.max_files);
+    //Allocate the memory for the metadata array
+    uint32_t nb_files = imgfs_file->header.max_files;
+    imgfs_file->metadata = calloc(nb_files, sizeof(struct img_metadata));
     if (imgfs_file->metadata == NULL) {
         fclose(imgfs_file->file);
         return ERR_OUT_OF_MEMORY;
     }
 
-    //reading the metadata
-    if (fread(imgfs_file->metadata,
-              sizeof(img_metadata),
-              imgfs_file->header.max_files,
-              imgfs_file->file) != imgfs_file->header.max_files) {
+    // Read the contents of the metadata
+    for (uint32_t i = 0; i < imgfs_file->header.max_files; i++) {
+        if (fread(&imgfs_file->metadata[i], sizeof(struct img_metadata), 1, imgfs_file->file)!= 1) {
+            fclose(imgfs_file->file);
+            free(imgfs_file->metadata);
+            return ERR_IO;;
 
-        fclose(imgfs_file->file);
-        free(imgfs_file->metadata);
-        return ERR_IO;
+        }
+
     }
+
+
+
+
+
+
+    // Everything went well
     return ERR_NONE;
 }
 

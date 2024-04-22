@@ -55,17 +55,19 @@ int help(int useless _unused, char **useless_too _unused) {
 int do_list_cmd(int argc, char **argv) {
     M_REQUIRE_NON_NULL(argv);
     //argc should contain program name, list command, and exactly one filename
-    if (argc != 3)
+
+    //CHANGE_SARA sould != 1 instead of !=3
+    if (argc != 1)
         return ERR_INVALID_COMMAND;
 
     // initialize structure, set all bytes to 0
     //CHANGE_SARA : changed struct imgfs_file imgfsFile = NULL to this line becasuse can't cast NULL to struct imgfs_file
     struct imgfs_file imgfsFile ;
-
     memset(&imgfsFile, 0, sizeof(imgfsFile));
 
     //Open
-    int open_ret = do_open(argv[2], "rb", &imgfsFile);
+    //CHANGE_SARA should be argv[0] instead of argv[3]
+    int open_ret = do_open(argv[0], "rb", &imgfsFile);
     if (open_ret != ERR_NONE) return open_ret;
 
     //Display
