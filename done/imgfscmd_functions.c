@@ -47,6 +47,7 @@ int help(int useless _unused, char **useless_too _unused) {
            default_small_res, default_small_res,
            MAX_SMALL_RES, MAX_SMALL_RES
     );
+
     return ERR_NONE;
 }
 
@@ -175,7 +176,7 @@ int do_delete_cmd(int argc, char **argv) {
      */
     M_REQUIRE_NON_NULL(argv);
 
-    if (argc != 2) { // CHANGED ZAC : Changed from 4 to 2
+    if (argc != 2) { //CHANGED ZAC : Changed from 4 to 2
         // Check if the number of arguments is correct (program name, command, imgFS filename, imgID)
         return ERR_NOT_ENOUGH_ARGUMENTS;
     }

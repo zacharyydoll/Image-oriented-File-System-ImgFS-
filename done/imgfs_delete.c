@@ -18,7 +18,6 @@ int do_delete(const char *img_id, struct imgfs_file *imgfs_file) {
         // Added condition to check if the image is valid
         if (strncmp(imgfs_file->metadata[idx].img_id, img_id, MAX_IMG_ID) == 0 &&
             imgfs_file->metadata[idx].is_valid != EMPTY) {
-            printf("Image Found: %s\n", img_id);
             imgfs_file->metadata[idx].is_valid = EMPTY; //invalidate the image if it was found
             found_flag = 1;
             break;
