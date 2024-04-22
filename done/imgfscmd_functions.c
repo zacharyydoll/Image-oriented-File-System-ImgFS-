@@ -182,8 +182,10 @@ int do_delete_cmd(int argc, char **argv) {
     }
 
     // CHANGED ZAC : modified values of argv[x] (just printed them to see which is which)
-    const char *imgfs_filename = argv[0];
-    const char *imgID = argv[1];
+    // CHANGE SARA : just switched the indexes cause argv[1] gave me the file name instead
+    const char *imgfs_filename = argv[1];
+    const char *imgID = argv[0];
+    printf("ID IS : %s \n",imgID);
 
 
 
@@ -203,6 +205,7 @@ int do_delete_cmd(int argc, char **argv) {
 
     //Delete
     int delete_ret = do_delete(imgID, &imgfsFile);
+    printf("img %s deleted",imgID);
     if (delete_ret != ERR_NONE) {
         do_close(&imgfsFile); // close the file before returning
         return delete_ret;
