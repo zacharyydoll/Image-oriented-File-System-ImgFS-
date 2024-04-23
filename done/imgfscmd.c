@@ -56,13 +56,14 @@ int main(int argc, char *argv[]) {
             argc--;
             argv++;
 
-            //CHANGE ZAC 22.04 ============================================
+            //CHANGE ZAC 23.04 ============================================
 
             int ret = commands[i].command_function(argc, argv);
 
             if (ret != ERR_NONE) {
                 fprintf(stderr, "Error: Invalid usage of command '%s'.\n", commands[i].name);
                 help(0, NULL);
+                ret = ERR_INVALID_COMMAND;
             }
 
             return ret;
@@ -71,7 +72,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    fprintf(stderr, "Unknown command: %s\n", argv[1]);
+    fprintf(stderr, "Unknown command: %s\n", argv[0]);
 
     help(argc,argv);
 

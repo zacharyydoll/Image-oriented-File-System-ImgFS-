@@ -187,7 +187,7 @@ int do_delete_cmd(int argc, char **argv) {
 
 
     if (strlen(imgID)>MAX_IMG_ID || imgID == NULL) {
-        //CHANGE ZAC 22.04 : modified return error to fit handout requirement
+        //CHANGE ZAC 23.04 : modified return error to fit handout requirement
         return ERR_INVALID_IMGID;
     }
 
