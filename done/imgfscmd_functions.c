@@ -91,15 +91,17 @@ int do_list_cmd(int argc, char **argv) {
 int do_create_cmd(int argc, char **argv) {
 
     M_REQUIRE_NON_NULL(argv);
-    if (argc < 3) {
-        // file name argument is mandatory (program name, command, file name)
+    //CHANGE ZAC 23.04 : changed from 4 to 1 (only mandatory argument is the file name)
+    if (argc < 1) {
+        // file name argument is mandatory
         return ERR_NOT_ENOUGH_ARGUMENTS;
     }
-    if (argv[2] == NULL) {
+    if (argv[0] == NULL) {
         return ERR_INVALID_FILENAME;
     }
 
-    const char *imgfs_filename = argv[2];
+    //CHANGE ZAC 23.04 : changed from 2 to 0 (the mandatory argument of the filename is the first to be parsed)
+    const char *imgfs_filename = argv[0];
     int max_files = default_max_files;
     int thumb_x_res = default_thumb_res;
     int thumb_y_res = default_thumb_res;
@@ -107,7 +109,7 @@ int do_create_cmd(int argc, char **argv) {
     int small_y_res = default_small_res;
 
     // first 3 arguments are mandatory
-    for (int i = 3; i < argc; ++i) {
+    for (int i = 1; i < argc; ++i) {
         char *curr = argv[i]; // current (optional) argument
 
         if (strcmp(curr, "-max_files") == 0) {
@@ -170,10 +172,7 @@ int do_create_cmd(int argc, char **argv) {
  * Deletes an image from the imgFS.
  */
 int do_delete_cmd(int argc, char **argv) {
-    /* **********************************************************************
-     * TODO WEEK 08: WRITE YOUR CODE HERE (and change the return if needed).
-     * **********************************************************************
-     */
+
     M_REQUIRE_NON_NULL(argv);
 
     if (argc != 2) { //CHANGED ZAC : Changed from 4 to 2
@@ -185,12 +184,11 @@ int do_delete_cmd(int argc, char **argv) {
     // CHANGE SARA : just switched the indexes cause argv[1] gave me the file name instead
     const char *imgfs_filename = argv[1];
     const char *imgID = argv[0];
-    printf("ID IS : %s \n",imgID);
-
 
 
     if (strlen(imgID)>MAX_IMG_ID || imgID == NULL) {
-        return ERR_INVALID_ARGUMENT;
+        //CHANGE ZAC 22.04 : modified return error to fit handout requirement
+        return ERR_INVALID_IMGID;
     }
 
     // initializing structure and setting all bytes to 0
@@ -205,7 +203,7 @@ int do_delete_cmd(int argc, char **argv) {
 
     //Delete
     int delete_ret = do_delete(imgID, &imgfsFile);
-    printf("img %s deleted",imgID);
+    printf("img %s deleted\n",imgID);
     if (delete_ret != ERR_NONE) {
         do_close(&imgfsFile); // close the file before returning
         return delete_ret;

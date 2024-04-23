@@ -51,29 +51,7 @@ int do_delete(const char *img_id, struct imgfs_file *imgfs_file) {
     return ERR_NONE;
 
     //===================================================================================================================
-    // Old version commented (for comparison if necessary)
-    /*for (uint32_t i = 0; i < imgfs_file->header.max_files; ++i) {
-        // find the image reference with the same name in the "metadata" and invalidate it (see handout)
-        if (strncmp(imgfs_file->metadata[i].img_id, img_id, MAX_IMG_ID) == 0 && imgfs_file->metadata[i].is_valid != EMPTY) {
-            //imgfs_file->metadata[i].is_valid = EMPTY;
 
-
-            //------------------------CHANGES -----------------------------------------------------------------------------------
-            //writing changes to disk using file functions (whole metadata for compatibility)
-            fseek(imgfs_file->file, sizeof(struct imgfs_header), SEEK_SET);
-            fwrite(&(imgfs_file->metadata), sizeof(struct imgfs_file), imgfs_file->header.nb_files, imgfs_file->file);
-
-            //updating header information
-            imgfs_file->header.nb_files--;
-            imgfs_file->header.version++;
-
-            //writing the header into the disk after the update
-            fseek(imgfs_file->file, 0, SEEK_SET);
-            fwrite(&(imgfs_file->header), sizeof(struct imgfs_header), 1, imgfs_file->file);
-
-            //----------------------------------------------------------------------------------------------------------------------
-            return ERR_NONE;
-        }*/
 }
 
 

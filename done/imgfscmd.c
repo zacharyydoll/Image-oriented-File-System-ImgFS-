@@ -56,8 +56,18 @@ int main(int argc, char *argv[]) {
             argc--;
             argv++;
 
-            return commands[i].command_function(argc , argv);
+            //CHANGE ZAC 22.04 ============================================
 
+            int ret = commands[i].command_function(argc, argv);
+
+            if (ret != ERR_NONE) {
+                fprintf(stderr, "Error: Invalid usage of command '%s'.\n", commands[i].name);
+                help(0, NULL);
+            }
+
+            return ret;
+
+            //============================================================
         }
     }
 
