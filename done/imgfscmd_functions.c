@@ -175,13 +175,11 @@ int do_delete_cmd(int argc, char **argv) {
 
     M_REQUIRE_NON_NULL(argv);
 
-    if (argc != 2) { //CHANGED ZAC : Changed from 4 to 2
-        // Check if the number of arguments is correct (program name, command, imgFS filename, imgID)
+    if (argc != 2) {
+        //delete requires <imgFS_filename> and <imgID> as arguments
         return ERR_NOT_ENOUGH_ARGUMENTS;
     }
 
-    // CHANGED ZAC : modified values of argv[x] (just printed them to see which is which)
-    // CHANGE SARA : just switched the indexes cause argv[1] gave me the file name instead
     const char *imgfs_filename = argv[0];
     const char *imgID = argv[1];
 
@@ -196,14 +194,13 @@ int do_delete_cmd(int argc, char **argv) {
     memset(&imgfsFile, 0, sizeof(imgfsFile));
 
     //Open
-    int open_ret = do_open(imgfs_filename, "r+b", &imgfsFile);
+    int open_ret = do_open(imgfs_filename, "rb+", &imgfsFile);
     //in case of error
     if (open_ret != ERR_NONE) return open_ret;
 
 
     //Delete
     int delete_ret = do_delete(imgID, &imgfsFile);
-    printf("img %s deleted\n",imgID);
     if (delete_ret != ERR_NONE) {
         do_close(&imgfsFile); // close the file before returning
         return delete_ret;

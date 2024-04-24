@@ -5,22 +5,23 @@ int do_name_and_content_dedup(struct imgfs_file *imgfs_file, uint32_t index) {
 
     M_REQUIRE_NON_NULL(imgfs_file);
     if (index >= imgfs_file->metadata.nb_files) {
-        return ERR_OUT_OF_BOUND;
+        return ERR_IMAGE_NOT_FOUND;
     }
 
     img_metadata *targetImg = &imgfs_file->metadata[index];
-    if (!targetImg->is_valid) return ERR_OUT_OF_BOUND; //if image is invalid, return out of bounds (see tests
+    if (!targetImg->is_valid) return ERR_IMAGE_NOT_FOUND; //if image is invalid, return out of bounds (see tests)
 
     for (uint32_t i = 0; i < imgfs_file->metadata.nb_files; ++i) {
 
         if (i != index) {
             struct img_metadata *currImg = imgfs_file->metadata[i];
 
+            if (!currImg->is_valid) return ERR_IMAGE_NOT_FOUND; // make sure current image is valid
+
             //ensure that the image database does not contain two images with the same internal identifier (handout)
             if (strncmp(currImg->img_id, imgfs_file->metadata->img_id, MAX_IMG_ID) == 0) {
                 return ERR_DUPLICATE_ID;
             }
-            if (!currImg->is_valid) return ERR_OUT_OF_BOUND; //if image is invalid, return out of bounds (see tests)
 
             //used memcmp instead of strcmp (SHA can refer to string or content -> compare raw data with memcmp)
             if (memcmp(imgfs_file->metadata[i].SHA,
