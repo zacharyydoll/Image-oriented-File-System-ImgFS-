@@ -62,9 +62,9 @@ int main(int argc, char *argv[]) {
             int ret = commands[i].command_function(argc, argv);
 
             if (ret != ERR_NONE) {
+                //CHANGE ZAC : deleted ret reassignment.
                 fprintf(stderr, "ERROR: %s\n", ERR_MSG(ret));
                 help(0, NULL);
-                ret = ERR_INVALID_COMMAND;
             }
 
             return ret;

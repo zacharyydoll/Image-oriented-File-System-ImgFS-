@@ -26,7 +26,7 @@ int do_delete(const char *img_id, struct imgfs_file *imgfs_file) {
 
     if (!found_flag) {
         //CHANGE ZAC 24.04 : modified return error to fit handout requirement
-        return ERR_INVALID_IMGID;
+        return ERR_IMAGE_NOT_FOUND;
     }
 
     //Write updated metadata to disk
