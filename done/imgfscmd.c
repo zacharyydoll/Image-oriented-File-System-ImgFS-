@@ -50,33 +50,31 @@ int main(int argc, char *argv[]) {
 
     argc--;
     argv++; // skips command call name
+
     for (int i = 0; i < NB_COMMANDS; ++i) {
         if (strcmp(argv[0], commands[i].name) == 0) {
             // Call the command function
             argc--;
             argv++;
 
-            //CHANGE ZAC 23.04 ============================================
+            //CHANGES ZAC 24.04 ================================================================================
 
             int ret = commands[i].command_function(argc, argv);
 
             if (ret != ERR_NONE) {
-                fprintf(stderr, "Error: Invalid usage of command '%s'.\n", commands[i].name);
+                fprintf(stderr, "ERROR: %s\n", ERR_MSG(ret));
                 help(0, NULL);
                 ret = ERR_INVALID_COMMAND;
             }
 
             return ret;
-
-            //============================================================
         }
     }
 
-    fprintf(stderr, "Unknown command: %s\n", argv[0]);
-
-    help(argc,argv);
-
+    fprintf(stderr, "ERROR: %s '%s'\n", ERR_MSG(ERR_INVALID_COMMAND), argv[0]);
+    help(0,NULL);
     return ERR_INVALID_COMMAND;
 
+    //=====================================================================================================
 
 }
