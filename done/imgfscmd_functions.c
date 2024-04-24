@@ -182,8 +182,8 @@ int do_delete_cmd(int argc, char **argv) {
 
     // CHANGED ZAC : modified values of argv[x] (just printed them to see which is which)
     // CHANGE SARA : just switched the indexes cause argv[1] gave me the file name instead
-    const char *imgfs_filename = argv[1];
-    const char *imgID = argv[0];
+    const char *imgfs_filename = argv[0];
+    const char *imgID = argv[1];
 
 
     if (strlen(imgID)>MAX_IMG_ID || imgID == NULL) {
