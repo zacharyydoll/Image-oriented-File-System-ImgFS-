@@ -202,9 +202,12 @@ int do_delete_cmd(int argc, char **argv) {
     //Delete
     int delete_ret = do_delete(imgID, &imgfsFile);
     if (delete_ret != ERR_NONE) {
-        do_close(&imgfsFile); // close the file before returning
-        return delete_ret;
+        //do_close(&imgfsFile);
 
+        /* CHANGE ZAC 24.04 : removed this line because it is already called in do_delete, and calling it twice might
+           print unexpected error messages (e.g. "ERROR: No such file or directory", instead of "ERROR: Image not found")
+           this was required to pass the tests of week08 */
+        return delete_ret;
     }
 
 

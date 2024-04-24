@@ -26,6 +26,7 @@ int do_delete(const char *img_id, struct imgfs_file *imgfs_file) {
 
     if (!found_flag) {
         //if no image corresponding image was found, directly return error
+        printf("Image not found\n");
         return ERR_IMAGE_NOT_FOUND;
     }
 

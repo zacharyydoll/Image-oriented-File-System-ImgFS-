@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    fprintf(stderr, "ERROR: %s '%s'\n", ERR_MSG(ERR_INVALID_COMMAND), argv[0]);
+    fprintf(stderr, "ERROR: %s\n", ERR_MSG(ERR_INVALID_COMMAND));
     help(0,NULL);
     return ERR_INVALID_COMMAND;
 
