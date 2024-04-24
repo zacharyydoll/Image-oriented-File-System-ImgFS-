@@ -4,17 +4,17 @@
 int do_name_and_content_dedup(struct imgfs_file *imgfs_file, uint32_t index) {
 
     M_REQUIRE_NON_NULL(imgfs_file);
-    if (index >= imgfs_file->metadata.nb_files) {
+    if (index >= imgfs_file->header.nb_files) {
         return ERR_IMAGE_NOT_FOUND;
     }
 
-    img_metadata *targetImg = &imgfs_file->metadata[index];
+    struct img_metadata *targetImg = &imgfs_file->metadata[index];
     if (!targetImg->is_valid) return ERR_IMAGE_NOT_FOUND; //if image is invalid, return out of bounds (see tests)
 
-    for (uint32_t i = 0; i < imgfs_file->metadata.nb_files; ++i) {
+    for (uint32_t i = 0; i < imgfs_file->header.nb_files; ++i) {
 
         if (i != index) {
-            struct img_metadata *currImg = imgfs_file->metadata[i];
+            struct img_metadata *currImg = &imgfs_file->metadata[i];
 
             if (!currImg->is_valid) return ERR_IMAGE_NOT_FOUND; // make sure current image is valid
 
