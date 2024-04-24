@@ -185,7 +185,6 @@ int do_delete_cmd(int argc, char **argv) {
     int delete_ret = do_delete(imgID, &imgfsFile);
     if (delete_ret != ERR_NONE) {
         do_close(&imgfsFile);
-        fprintf(stderr, "error code in do_delete_cmd: %d\n", delete_ret);
         return delete_ret;
     }
 

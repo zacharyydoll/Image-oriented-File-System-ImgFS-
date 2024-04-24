@@ -18,7 +18,7 @@ int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file) {
     // Finish initialization of the header (max_files and resized_res are already provided, see handout)
     strncpy(imgfs_file->header.name, CAT_TXT, sizeof(imgfs_file->header.name) - 1);
     imgfs_file->header.name[sizeof(imgfs_file->header.name) - 1] = '\0';
-    imgfs_file->header.version = 1;
+    imgfs_file->header.version = 0;
     imgfs_file->header.nb_files = 0; // no files yet
     imgfs_file->header.unused_32 = 0;
     imgfs_file->header.unused_64 = 0;
@@ -33,6 +33,7 @@ int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file) {
     // Handle write errors in the header
     if (fwrite(&(imgfs_file->header), sizeof(struct imgfs_header), 1, imgfs_file->file) != 1) {
         fclose(imgfs_file->file);
+        free(imgfs_file->metadata); // Free the memory allocated before returning
         return ERR_IO;
     }
     // Handle write errors in the metadata
@@ -47,6 +48,9 @@ int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file) {
     }
     // print # of items written (see handout)
     printf("%d item(s) written\n", 1 + imgfs_file->header.nb_files); // header + each metadata entry
+
+    fclose(imgfs_file->file);  // Ensure the file is closed in the successful path
+    free(imgfs_file->metadata);
 
     return ERR_NONE;
 }
