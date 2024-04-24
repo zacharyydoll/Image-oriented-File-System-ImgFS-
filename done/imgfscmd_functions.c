@@ -108,53 +108,35 @@ int do_create_cmd(int argc, char **argv) {
     int small_x_res = default_small_res;
     int small_y_res = default_small_res;
 
+    // CHANGES ZAC =========================================================================================================
+
     // first 3 arguments are mandatory
     for (int i = 1; i < argc; ++i) {
-        char *curr = argv[i]; // current (optional) argument
-
-        if (strcmp(curr, "-max_files") == 0) {
-            // -max_files must have at least one parameter
-            if (i + 1 < argc) {
-                max_files = (uint32_t) atouint32(argv[i + 1]); // convert parameter string to integer
-
-                if (max_files == 0) {
-                    return ERR_INVALID_ARGUMENT;
-                }
+        char *curr = argv[i]; // Current (optional) argument
+        
+        if (strcmp(curr, "-max_files") == 0 && i + 1 < argc) { //checks that we have at least one parameter
+            max_files = (uint32_t) atouint32(argv[++i]);  // Move to next argument and convert to integer
+            if (max_files == 0) {
+                return ERR_INVALID_ARGUMENT;
             }
-            else return ERR_NOT_ENOUGH_ARGUMENTS;
-
-        } else if (strcmp(curr, "-thumb_res") == 0) {
-            // -thumb_res must have at least two parameters
-            if (i + 2 < argc) {
-                thumb_x_res = (uint16_t) atouint16(argv[i + 1]);
-                thumb_y_res = (uint16_t) atouint16(argv[i + 2]);
-
-                //CHANGE_SARA : changed x_res == 0 to thumb_x_res == 0...x_res is not defined anywhere else (did the same to y_res)
-                if (thumb_x_res == 0 || thumb_y_res == 0 || thumb_x_res > MAX_THUMB_RES || thumb_y_res > MAX_THUMB_RES) {
-                    return ERR_RESOLUTIONS;
-                }
+        } else if (strcmp(curr, "-thumb_res") == 0 && i + 2 < argc) { //checks that we have at least two parameters
+            thumb_x_res = (uint16_t) atouint16(argv[++i]);
+            thumb_y_res = (uint16_t) atouint16(argv[++i]);
+            if (thumb_x_res == 0 || thumb_y_res == 0 || thumb_x_res > MAX_THUMB_RES || thumb_y_res > MAX_THUMB_RES) {
+                return ERR_RESOLUTIONS;
             }
-            else return ERR_NOT_ENOUGH_ARGUMENTS;
-
-        } else if (strcmp(curr, "-small_res") == 0) {
-            // -small_res must have at least two parameters
-            if (i + 2 < argc) {
-                small_x_res = (uint16_t) atouint16(argv[i + 1]);
-                small_y_res = (uint16_t) atouint16(argv[i + 2]);
-
-                //CHANGE_SARA : changed x_res == 0 to small_x_res == 0...x_res is not defined anywhere else (did the same to y_res)
-                if (small_x_res == 0 || small_y_res == 0 || small_x_res > MAX_SMALL_RES || small_y_res > MAX_SMALL_RES) {
-                    return ERR_RESOLUTIONS;
-                }
+        } else if (strcmp(curr, "-small_res") == 0 && i + 2 < argc) {  //checks that we have at least two parameters
+            small_x_res = (uint16_t) atouint16(argv[++i]);
+            small_y_res = (uint16_t) atouint16(argv[++i]);
+            if (small_x_res == 0 || small_y_res == 0 || small_x_res > MAX_SMALL_RES || small_y_res > MAX_SMALL_RES) {
+                return ERR_RESOLUTIONS;
             }
-            else return ERR_NOT_ENOUGH_ARGUMENTS;
-
         } else {
-            // case where optional argument is not -max_files, -thumb_res, or -small_res
-            return ERR_INVALID_ARGUMENT;
+            return ERR_INVALID_ARGUMENT;  // Argument is not recognized or missing necessary parameters
         }
     }
 
+    // =====================================================================================================================
 
     // initialize imgfs_file structure with the given parameters and call do_create to initialize rest
     struct imgfs_file imgfsFile = {
@@ -203,6 +185,7 @@ int do_delete_cmd(int argc, char **argv) {
     int delete_ret = do_delete(imgID, &imgfsFile);
     if (delete_ret != ERR_NONE) {
         do_close(&imgfsFile);
+        fprintf(stderr, "error code in do_delete_cmd: %d\n", delete_ret);
         return delete_ret;
     }
 
