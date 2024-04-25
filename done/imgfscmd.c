@@ -13,7 +13,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-
+#include <vips/vips.h>
 
 /*******************************************************************************
  * MAIN
@@ -42,6 +42,13 @@ command_mapping commands[] = {
 #define NB_COMMANDS (sizeof(commands) / sizeof(command_mapping))
 
 int main(int argc, char *argv[]) {
+
+    //week 9 : initializing vips and shutting it down after the execution
+    if (VIPS_INIT(argv[0])) {
+        vips_error_exit("unable to start VIPS");
+    }
+    vips_shutdown();
+
 
 
     if (argc < 2) {

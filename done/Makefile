@@ -55,6 +55,12 @@ LDLIBS += -lm -lssl -lcrypto
 
 OBJS=$(subst .c,.o,$(SRCS))
 
+# Add options for the compiler to include the library's headers
+CFLAGS += $(shell pkg-config vips --cflags)
+
+# Add the library to the linker
+LDLIBS += $(shell pkg-config vips --libs)
+
 all:: all-deferred
 
 
@@ -82,6 +88,8 @@ endif
 ifneq (,$(wildcard ./http-test-server.c))
 TARGETS += http-test-server
 endif
+
+
 
 all-deferred:: $(TARGETS)
 
@@ -120,6 +128,8 @@ test-%:
 
 $(TEST_DIR)/unit/%:
 	$(MAKE) SRC_DIR=$${PWD} -B -C $(TEST_DIR)/unit unit-test-$*
+
+
 
 
 
