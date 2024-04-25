@@ -168,6 +168,20 @@ build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_delete.c.o: C_COMPILER__
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
   OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done
 
+build CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfscreate.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit/unit-test-imgfscreate.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
+  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfscreate.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
+  OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
+  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit
+
+build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/image_dedup.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/image_dedup.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
+  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/image_dedup.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
+  OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
+  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target cs202_24_prj_sophie_zac
@@ -176,7 +190,7 @@ build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_delete.c.o: C_COMPILER__
 #############################################
 # Link the executable cs202_24_prj_sophie_zac
 
-build cs202_24_prj_sophie_zac: C_EXECUTABLE_LINKER__cs202_24_prj_sophie_zac_Debug CMakeFiles/cs202_24_prj_sophie_zac.dir/done/error.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_tools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfscmd.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfscmd_functions.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/util.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/error.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/http-test-server.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfs_tools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd_functions.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/util.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfslist.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfsstruct.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfstools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/image_content.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_create.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_delete.c.o
+build cs202_24_prj_sophie_zac: C_EXECUTABLE_LINKER__cs202_24_prj_sophie_zac_Debug CMakeFiles/cs202_24_prj_sophie_zac.dir/done/error.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_tools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfscmd.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfscmd_functions.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/util.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/error.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/http-test-server.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfs_tools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd_functions.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/util.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfslist.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfsstruct.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfstools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/image_content.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_create.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_delete.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfscreate.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/image_dedup.c.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
   POST_BUILD = :

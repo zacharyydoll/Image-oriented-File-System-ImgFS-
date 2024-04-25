@@ -4,10 +4,14 @@
 
 int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file) {
     // Parameter validity check
+    //CHANGE_SARA 25/04 : tests require an invalid argument error for null filename
+    M_REQUIRE_NON_NULL(imgfs_filename);
     M_REQUIRE_NON_NULL(imgfs_file);
+    /*
     if (imgfs_filename == NULL) {
         return ERR_INVALID_FILENAME; // See provided tests (week 8) for expected error value in this case
     }
+     */
 
     // Open the file
     imgfs_file->file = fopen(imgfs_filename, "wb");
@@ -49,8 +53,9 @@ int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file) {
     // print # of items written (see handout)
     printf("%d item(s) written\n", 1 + imgfs_file->header.nb_files); // header + each metadata entry
 
-    fclose(imgfs_file->file);  // Ensure the file is closed in the successful path
-    free(imgfs_file->metadata);
+    //CHANGE_SARA 25/04 : moved fclose to do_create_cmd as in ED #989 - only solution to pass test unit-test-imgfscreate.c:42:E:do_create_correct:do_create_correct:0: (after this point) Early exit with return value 1
+    //fclose(imgfs_file->file);  // Ensure the file is closed in the successful path
+    //free(imgfs_file->metadata);
 
     return ERR_NONE;
 }

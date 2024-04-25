@@ -91,6 +91,7 @@ int do_list_cmd(int argc, char **argv) {
 int do_create_cmd(int argc, char **argv) {
 
     M_REQUIRE_NON_NULL(argv);
+
     //CHANGE ZAC 23.04 : changed from 4 to 1 (only mandatory argument is the file name)
     if (argc < 1) {
         // file name argument is mandatory
@@ -102,32 +103,41 @@ int do_create_cmd(int argc, char **argv) {
 
     //CHANGE ZAC 23.04 : changed from 2 to 0 (the mandatory argument of the filename is the first to be parsed)
     const char *imgfs_filename = argv[0];
-    int max_files = default_max_files;
-    int thumb_x_res = default_thumb_res;
-    int thumb_y_res = default_thumb_res;
-    int small_x_res = default_small_res;
-    int small_y_res = default_small_res;
+    uint32_t max_files = default_max_files;
+    uint16_t thumb_x_res = default_thumb_res;
+    uint16_t thumb_y_res = default_thumb_res;
+    uint16_t small_x_res = default_small_res;
+    uint16_t small_y_res = default_small_res;
 
     // CHANGES ZAC =========================================================================================================
 
     // first 3 arguments are mandatory
     for (int i = 1; i < argc; ++i) {
         char *curr = argv[i]; // Current (optional) argument
-        
-        if (strcmp(curr, "-max_files") == 0 && i + 1 < argc) { //checks that we have at least one parameter
-            max_files = (uint32_t) atouint32(argv[++i]);  // Move to next argument and convert to integer
+        //CHANGE_SARA 25/04 : just added to case where there's not enough flag arguments...before it was all handled under ERR_INVALID_ARGUMENT
+        if (strcmp(curr, "-max_files") == 0 ) {//checks that we have at least one parameter
+            if (i + 1 >= argc) {
+                return ERR_NOT_ENOUGH_ARGUMENTS;
+            }
+            max_files = atouint32(argv[++i]);  // Move to next argument and convert to integer
             if (max_files == 0) {
                 return ERR_INVALID_ARGUMENT;
             }
-        } else if (strcmp(curr, "-thumb_res") == 0 && i + 2 < argc) { //checks that we have at least two parameters
-            thumb_x_res = (uint16_t) atouint16(argv[++i]);
-            thumb_y_res = (uint16_t) atouint16(argv[++i]);
+        } else if (strcmp(curr, "-thumb_res") == 0 ) {//checks that we have at least two parameters
+            if (i + 2 >= argc) {
+                return ERR_NOT_ENOUGH_ARGUMENTS;
+            }
+            thumb_x_res =  atouint16(argv[++i]);
+            thumb_y_res =  atouint16(argv[++i]);
             if (thumb_x_res == 0 || thumb_y_res == 0 || thumb_x_res > MAX_THUMB_RES || thumb_y_res > MAX_THUMB_RES) {
                 return ERR_RESOLUTIONS;
             }
-        } else if (strcmp(curr, "-small_res") == 0 && i + 2 < argc) {  //checks that we have at least two parameters
-            small_x_res = (uint16_t) atouint16(argv[++i]);
-            small_y_res = (uint16_t) atouint16(argv[++i]);
+        } else if (strcmp(curr, "-small_res") == 0 ) {//checks that we have at least two parameters
+            if (i + 2 >= argc) {
+                return ERR_NOT_ENOUGH_ARGUMENTS;
+            }
+            small_x_res =  atouint16(argv[++i]);
+            small_y_res =  atouint16(argv[++i]);
             if (small_x_res == 0 || small_y_res == 0 || small_x_res > MAX_SMALL_RES || small_y_res > MAX_SMALL_RES) {
                 return ERR_RESOLUTIONS;
             }
@@ -146,6 +156,9 @@ int do_create_cmd(int argc, char **argv) {
         }
     };
     do_create(imgfs_filename, &imgfsFile);
+    //CHANGE_SARA 25/04 : new fclose
+    fclose(imgfsFile.file);
+    free(imgfsFile.metadata);
 
     return ERR_NONE;
 }

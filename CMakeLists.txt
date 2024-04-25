@@ -52,6 +52,8 @@ add_executable(cs202_24_prj_sophie_zac
         done/image_content.c
         done/imgfs_create.c
         done/imgfs_delete.c
+        provided/tests/unit/unit-test-imgfscreate.c
+        done/image_dedup.c
 
 
 )
