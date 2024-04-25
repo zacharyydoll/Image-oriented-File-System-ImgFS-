@@ -1,4 +1,4 @@
-# Install script for directory: /home/parallels/cs202-24-prj-sophie-zac
+# Install script for directory: /home/zachary/Desktop/cs202-24-prj-sophie-zac
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/parallels/cs202-24-prj-sophie-zac/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/zachary/Desktop/cs202-24-prj-sophie-zac/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
