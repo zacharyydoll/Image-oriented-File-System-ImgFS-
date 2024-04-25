@@ -49,138 +49,124 @@ cmake_ninja_workdir = /home/parallels/cs202-24-prj-sophie-zac/cmake-build-debug/
 
 build cmake_object_order_depends_target_cs202_24_prj_sophie_zac: phony || CMakeFiles/cs202_24_prj_sophie_zac.dir
 
-build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/error.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/src/error.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
-  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/error.c.o.d
+build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/error.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/error.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
+  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/error.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
-  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src
+  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done
 
-build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/http-test-server.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/src/http-test-server.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
-  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/http-test-server.c.o.d
+build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_tools.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/imgfs_tools.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
+  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_tools.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
-  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src
+  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done
 
-build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/imgfs_tools.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/src/imgfs_tools.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
-  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/imgfs_tools.c.o.d
+build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfscmd.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/imgfscmd.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
+  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfscmd.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
-  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src
+  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done
 
-build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/imgfscmd.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/src/imgfscmd.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
-  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/imgfscmd.c.o.d
+build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfscmd_functions.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/imgfscmd_functions.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
+  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfscmd_functions.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
-  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src
+  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done
 
-build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/imgfscmd_functions.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/src/imgfscmd_functions.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
-  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/imgfscmd_functions.c.o.d
+build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/util.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/util.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
+  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/util.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
-  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src
-
-build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/util.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/src/util.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
-  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/util.c.o.d
-  FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
-  OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
-  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src
-
-build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/tests/unit/unit-test-imgfslist.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/tests/unit/unit-test-imgfslist.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
-  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/tests/unit/unit-test-imgfslist.c.o.d
-  FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
-  OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
-  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/tests/unit
-
-build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/tests/unit/unit-test-imgfsstruct.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/tests/unit/unit-test-imgfsstruct.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
-  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/tests/unit/unit-test-imgfsstruct.c.o.d
-  FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
-  OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
-  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/tests/unit
-
-build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/tests/unit/unit-test-imgfstools.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/tests/unit/unit-test-imgfstools.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
-  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/tests/unit/unit-test-imgfstools.c.o.d
-  FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
-  OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
-  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/tests/unit
+  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done
 
 build CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/error.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/provided/src/error.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
   DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/error.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
   OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src
 
 build CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/http-test-server.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/provided/src/http-test-server.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
   DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/http-test-server.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
   OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src
 
 build CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfs_tools.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/provided/src/imgfs_tools.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
   DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfs_tools.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
   OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src
 
 build CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/provided/src/imgfscmd.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
   DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
   OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src
 
 build CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd_functions.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/provided/src/imgfscmd_functions.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
   DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd_functions.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
   OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src
 
 build CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/util.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/provided/src/util.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
   DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/util.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
   OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src
 
 build CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfslist.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit/unit-test-imgfslist.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
   DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfslist.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
   OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit
 
 build CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfsstruct.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit/unit-test-imgfsstruct.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
   DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfsstruct.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
   OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit
 
 build CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfstools.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit/unit-test-imgfstools.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
   DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfstools.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
   OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit
 
-build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/main.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/src/main.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
-  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/main.c.o.d
+build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/image_content.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/image_content.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
+  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/image_content.c.o.d
   FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
-  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src
+  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done
+
+build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_create.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/imgfs_create.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
+  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_create.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
+  OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
+  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done
+
+build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_delete.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /home/parallels/cs202-24-prj-sophie-zac/done/imgfs_delete.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
+  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_delete.c.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/parallels/cs202-24-prj-sophie-zac/provided/src -I/home/parallels/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
+  OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
+  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done
 
 
 # =============================================================================
@@ -190,7 +176,7 @@ build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/main.c.o: C_COMPILER__cs20
 #############################################
 # Link the executable cs202_24_prj_sophie_zac
 
-build cs202_24_prj_sophie_zac: C_EXECUTABLE_LINKER__cs202_24_prj_sophie_zac_Debug CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/error.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/http-test-server.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/imgfs_tools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/imgfscmd.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/imgfscmd_functions.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/util.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/tests/unit/unit-test-imgfslist.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/tests/unit/unit-test-imgfsstruct.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/tests/unit/unit-test-imgfstools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/error.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/http-test-server.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfs_tools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd_functions.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/util.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfslist.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfsstruct.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfstools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/src/main.c.o
+build cs202_24_prj_sophie_zac: C_EXECUTABLE_LINKER__cs202_24_prj_sophie_zac_Debug CMakeFiles/cs202_24_prj_sophie_zac.dir/done/error.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_tools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfscmd.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfscmd_functions.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/util.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/error.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/http-test-server.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfs_tools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd_functions.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/util.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfslist.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfsstruct.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/tests/unit/unit-test-imgfstools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/image_content.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_create.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_delete.c.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
   POST_BUILD = :

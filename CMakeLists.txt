@@ -5,30 +5,27 @@ set(CMAKE_CXX_STANDARD 14)
 
 include_directories(provided/src)
 include_directories(provided/tests/unit)
+include_directories(/usr/include/glib-2.0)
+include_directories(/usr/lib/x86_64-linux-gnu/glib-2.0/include)
 
 add_executable(cs202_24_prj_sophie_zac
-        done/handouts/01.imgfs.md
-        done/handouts/01.main.md
-        done/src/error.c
-        done/src/error.h
-        done/src/http-test-server.c
-        done/src/http_net.h
-        done/src/http_prot.h
-        done/src/image_content.h
-        done/src/image_dedup.h
-        done/src/imgfs.h
-        done/src/imgfs_server_service.h
-        done/src/imgfs_tools.c
-        done/src/imgfscmd.c
-        done/src/imgfscmd_functions.c
-        done/src/imgfscmd_functions.h
-        done/src/socket_layer.h
-        done/src/util.c
-        done/src/util.h
-        done/tests/unit/test.h
-        done/tests/unit/unit-test-imgfslist.c
-        done/tests/unit/unit-test-imgfsstruct.c
-        done/tests/unit/unit-test-imgfstools.c
+
+        done/error.c
+        done/error.h
+        done/http_net.h
+        done/http_prot.h
+        done/image_content.h
+        done/image_dedup.h
+        done/imgfs.h
+        done/imgfs_server_service.h
+        done/imgfs_tools.c
+        done/imgfscmd.c
+        done/imgfscmd_functions.c
+        done/imgfscmd_functions.h
+        done/socket_layer.h
+        done/util.c
+        done/util.h
+
 
         provided/handouts/01.imgfs.md
         provided/handouts/01.main.md
@@ -52,8 +49,9 @@ add_executable(cs202_24_prj_sophie_zac
         provided/tests/unit/unit-test-imgfslist.c
         provided/tests/unit/unit-test-imgfsstruct.c
         provided/tests/unit/unit-test-imgfstools.c
-        done/src/main.c
-        done/tests/unit/unit-test-imgfslist.c
-        done/tests/unit/unit-test-imgfsstruct.c
+        done/image_content.c
+        done/imgfs_create.c
+        done/imgfs_delete.c
+
 
 )
