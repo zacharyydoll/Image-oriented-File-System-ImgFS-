@@ -47,6 +47,5 @@ int do_name_and_content_dedup(struct imgfs_file *imgfs_file, uint32_t index) {
     //case where image has no duplicate content, and no duplicate id
     //CHANGE_SARA 26/04 : Updated the case with no duplicate id but not sure about it
     targetImg->offset[ORIG_RES] = 0;
-
     return ERR_NONE;
 }
