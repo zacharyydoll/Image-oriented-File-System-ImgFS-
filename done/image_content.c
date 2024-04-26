@@ -5,12 +5,13 @@
 #include <vips/vips.h>
 
 int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index){
+    printf("currently in lazy resize function");
 
     if (resolution != THUMB_RES && resolution != SMALL_RES) {
         return ERR_INVALID_ARGUMENT; // Return appropriate error value
     }
 
-    if (imgfs_file == NULL || index >= imgfs_file->header.nb_files) {
+    if (imgfs_file == NULL || index > imgfs_file->header.nb_files) {
         return ERR_INVALID_ARGUMENT; // Invalid file pointer
     }
     //if the image is already with the right resolution

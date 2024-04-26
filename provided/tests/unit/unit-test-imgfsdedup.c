@@ -73,7 +73,7 @@ START_TEST(do_name_and_content_dedup_duplicate_id_empty)
     strcpy(md->img_id, "pic1");
     md->is_valid = NON_EMPTY;
 
-    ck_assert_err(do_name_and_content_dedup(&file, 2), ERR_NONE);
+    ck_assert_err(do_name_and_content_dedup(&file, 2), ERR_NONE); //don't understand why shouldn't be any error
 
     do_close(&file);
 
