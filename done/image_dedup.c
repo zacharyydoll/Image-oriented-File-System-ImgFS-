@@ -2,7 +2,6 @@
 #include <string.h> // for memcmp
 
 int do_name_and_content_dedup(struct imgfs_file *imgfs_file, uint32_t index) {
-
     M_REQUIRE_NON_NULL(imgfs_file);
     //CHANGE_SARA 26/04 : Updated the condition to > instead of >=
     if (index > imgfs_file->header.nb_files) {
