@@ -19,7 +19,6 @@ int do_name_and_content_dedup(struct imgfs_file *imgfs_file, uint32_t index) {
         if (i != index) {
             struct img_metadata *currImg = &imgfs_file->metadata[i];
 
-
             //ensure that the image database does not contain two images with the same internal identifier (handout)
             //CHANGE_SARA 26/04 : Updated the condition to metadata[index]
             if (strncmp(currImg->img_id, imgfs_file->metadata[index].img_id, MAX_IMG_ID) == 0) {
