@@ -15,10 +15,21 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index){
     if (index > imgfs_file->header.nb_files) {
         return ERR_INVALID_IMGID; // Invalid file pointer
     }
+
+    //CHANGE ZAC 28.04
+    // check if resolution data already exists -> check if offset is non-zero, as zero offset means no data stored for that resolution
+    // (I think...)
+    if (imgfs_file->metadata[index].offset[resolution] != 0) {
+        return ERR_NONE; // resolution data already exists, so no need to resize
+    }
+
+    /*
     //if the image is already with the right resolution
     if(imgfs_file->metadata[index].orig_res[resolution] == (uint32_t)resolution) {
         return ERR_NONE;
     }
+    */
+
     uint32_t target_height;
     uint32_t target_width;
     if (resolution == THUMB_RES) {
@@ -66,8 +77,6 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index){
     }
 
 
-
-
     VipsImage* resized_image = NULL;
     if (vips_thumbnail_image(orig_image, &resized_image, target_width, "height", target_height, NULL) != 0) {
         // Handle resizing failure
@@ -84,6 +93,9 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index){
         free(img_data);
         return ERR_IMGLIB;
     }
+
+    // CHANGE ZAC 28.04 : manually ensure file pointer is at the end of the file before writing
+    fseek(imgfs_file->file, 0, SEEK_END); // Move file pointer to the end of the file
 
     // Write the buffer contents to the end of the imgFS file
     if (fwrite(buffer, 1, buffer_size, imgfs_file->file) != buffer_size) {
