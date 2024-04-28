@@ -13,12 +13,12 @@ int do_name_and_content_dedup(struct imgfs_file *imgfs_file, uint32_t index) {
     if (targetImg->is_valid == EMPTY) {
         return ERR_IMAGE_NOT_FOUND; //if image is invalid, return out of bounds (see tests)
     }
-
     for (uint32_t i = 0; i < imgfs_file->header.nb_files; ++i) {
 
-        if (i != index) {
-            struct img_metadata *currImg = &imgfs_file->metadata[i];
+        struct img_metadata *currImg = &imgfs_file->metadata[i];
 
+        //CHANGE_ZAC 27/04 : Added the condition that image must be ignored if is_valid is empty (see handout)
+        if (i != index && currImg->is_valid != EMPTY) {
             //ensure that the image database does not contain two images with the same internal identifier (handout)
             //CHANGE_SARA 26/04 : Updated the condition to metadata[index]
             if (strncmp(currImg->img_id, imgfs_file->metadata[index].img_id, MAX_IMG_ID) == 0) {
