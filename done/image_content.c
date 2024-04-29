@@ -5,7 +5,6 @@
 #include <vips/vips.h>
 
 int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index){
-    printf("currently in lazy resize function");
     M_REQUIRE_NON_NULL(imgfs_file);
 
 
@@ -19,16 +18,17 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index){
     //CHANGE ZAC 28.04
     // check if resolution data already exists -> check if offset is non-zero, as zero offset means no data stored for that resolution
     // (I think...)
+
     if (imgfs_file->metadata[index].offset[resolution] != 0) {
         return ERR_NONE; // resolution data already exists, so no need to resize
     }
 
     /*
-    //if the image is already with the right resolution
-    if(imgfs_file->metadata[index].orig_res[resolution] == (uint32_t)resolution) {
+    if(imgfs_file->metadata[index].orig_res[0] == resolution && imgfs_file->metadata[index].orig_res[1] == resolution ){
         return ERR_NONE;
     }
-    */
+     */
+
 
     uint32_t target_height;
     uint32_t target_width;
@@ -111,9 +111,24 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index){
 
     // Update metadata for the new image
     long end_offset = ftell(imgfs_file->file);
+
+
     imgfs_file->metadata[index].offset[resolution] = end_offset - buffer_size;
     imgfs_file->metadata[index].size[resolution] = buffer_size;
     imgfs_file->metadata[index].is_valid = 1; // Mark the image as valid
+
+    // Write metadata changes to disk
+    long metadata_offset = sizeof(struct imgfs_header) + index * sizeof(struct img_metadata);
+    fseek(imgfs_file->file, metadata_offset, SEEK_SET);
+    if (fwrite(&imgfs_file->metadata[index], sizeof(struct img_metadata), 1, imgfs_file->file) !=1) {
+        g_object_unref(orig_image);
+        g_object_unref(resized_image);
+        free(img_data);
+        g_free(buffer);
+        return ERR_IO;
+    }
+
+
 
     // Cleanup
     g_object_unref(orig_image);
