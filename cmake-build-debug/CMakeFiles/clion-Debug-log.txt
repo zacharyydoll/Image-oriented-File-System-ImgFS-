@@ -1,4 +1,4 @@
 /Applications/CLion.app/Contents/bin/cmake/mac/aarch64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/aarch64/ninja -G Ninja -S /Users/Zachary/Desktop/BA4/CompSys/cs202-24-prj-sophie-zac -B /Users/Zachary/Desktop/BA4/CompSys/cs202-24-prj-sophie-zac/cmake-build-debug
--- Configuring done (0.0s)
+-- Configuring done (0.1s)
 -- Generating done (0.0s)
 -- Build files have been written to: /Users/Zachary/Desktop/BA4/CompSys/cs202-24-prj-sophie-zac/cmake-build-debug
