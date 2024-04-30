@@ -37,7 +37,7 @@ int do_read(const char *img_id, int resolution, char **image_buffer,
 
     //read the content of the image into buffer, now that we have index and size
     *image_size = imgfs_file->metadata[imgID_idx].size[resolution];
-    *image_buffer = malloc(*image_size);
+    *image_buffer = calloc(1,*image_size);
     if(*image_buffer == NULL) {
         return ERR_OUT_OF_MEMORY;
     }
