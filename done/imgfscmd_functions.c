@@ -313,7 +313,24 @@ int do_insert_cmd(int argc, char **argv)
  * Create a new name for the image file.
  */
 static void create_name(const char* img_id, int resolution, char** new_name) {
+    const char* resolution_str = NULL;
 
+    switch (resolution) {
+        case ORIG_RES:
+            resolution_str = "_orig";
+            break;
+        case THUMB_RES:
+            resolution_str = "_thumb";
+            break;
+        case SMALL_RES:
+            resolution_str = "_small";
+            break;
+        default:
+            resolution_str = "_unknownResolution";
+    }
+
+    //format : image_id + resolution_suffix + '.jpg' + '\0' (see handout)
+    *new_name = malloc(strlen(img_id) + strlen(resolution_str) + strlen(".jpg") + 1);
 }
 
 /**********************************************************************
@@ -321,6 +338,19 @@ static void create_name(const char* img_id, int resolution, char** new_name) {
  */
 static int write_disk_image(const char *filename, const char *image_buffer, uint32_t image_size) {
 
+    FILE *file = fopen(filename, "wb");
+    if (!file) {
+        return ERR_IO; // error file
+    }
+
+    uint32_t written = fwrite(image_buffer, 1, image_size, file);
+    fclose(file);
+
+    if (written != image_size) {
+        return ERR_IO; // error writing the full buffer
+    }
+
+    return ERR_NONE;
 }
 
 
@@ -329,7 +359,31 @@ static int write_disk_image(const char *filename, const char *image_buffer, uint
  * Read content of file to buffer.
  */
 static int read_disk_image(const char *path, char **image_buffer, uint32_t *image_size) {
+    FILE *file = fopen(path, "rb");
+    if (!file) {
+        return ERR_IO;
+    }
 
+    // seek end of file to get its size
+    fseek(file, 0, SEEK_END);
+    *image_size = ftell(file);
+    fseek(file, 0, SEEK_SET); //go back to start of file
+
+    *image_buffer = (char *)malloc(*image_size); // allocate memory for image
+    if (!(*image_buffer)) {
+        fclose(file);
+        return ERR_OUT_OF_MEMORY;
+    }
+
+    size_t read = fread(*image_buffer, 1, *image_size, file); //read file into buffer
+    fclose(file);
+
+    if (read != *image_size) {
+        free(*image_buffer);
+        return ERR_IO;
+    }
+
+    return ERR_NONE;
 }
 
 
