@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     argv++; // skips command call name
 
     // Loop through all defined commands
-    for (int i = 0; i < NB_COMMANDS; ++i) {
+    for (int i = 0; i < (int)NB_COMMANDS; ++i) {
         ret = ERR_INVALID_COMMAND;
         //search for the command name
         if (strcmp(argv[0], commands[i].name) == 0) {
