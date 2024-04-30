@@ -45,7 +45,11 @@ extern "C" {
 #endif
 
 
-
+/**
+ * @struct imgfs_header
+ * @brief This structure forms the header of an imgFS file. It keeps basic information, like the name, version,
+ * maximum number of files, and the resolutions of thumbnail and small images.
+ */
 struct imgfs_header {
     char name[MAX_IMGFS_NAME];
     uint32_t version;
@@ -57,7 +61,11 @@ struct imgfs_header {
 };
 
 //---------------------------------------------------------
-
+/**
+ * @struct img_metadata
+ * @brief This structure holds metadata information for an image. It stores the image's id, SHA hash,
+ * reserved size, offset to the actual image, and validity of the image.
+ */
 struct img_metadata {
     char img_id[MAX_IMG_ID + 1]; //adding the NULL terminator
     unsigned char SHA[SHA256_DIGEST_LENGTH];
@@ -70,7 +78,10 @@ struct img_metadata {
 };
 
 //-------------------------------------------------------------
-
+/**
+ * @struct imgfs_file
+ * @brief A composite structure to hold a file pointer, header, and metadata array in one unit.
+ */
 struct imgfs_file {
     FILE *file;
     struct imgfs_header header;

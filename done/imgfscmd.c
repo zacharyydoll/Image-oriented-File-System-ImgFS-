@@ -19,29 +19,31 @@
  * MAIN
  */
 
-//commands that need to be parsed array !!!
-// Command structure
+
+
 //Typedef for command function pointer
 typedef int (*command)(int argc, char *argv[]);
 
-// Struct for command mapping
+//Struct Define a struct that maps command names to their appropriate functions
 typedef struct {
     const char *name;
     command command_function;
 } command_mapping;
 
 
-// Array of commands
+// Array of commands mapped to their functions
 command_mapping commands[] = {
-        {"help",   help},
-        {"list",   do_list_cmd},
-        {"create", do_create_cmd},
-        {"delete", do_delete_cmd},
+    {"help",   help},
+    {"list",   do_list_cmd},
+    {"create", do_create_cmd},
+    {"delete", do_delete_cmd},
 };
 
-#define NB_COMMANDS (sizeof(commands) / sizeof(command_mapping))
+#define NB_COMMANDS (sizeof(commands) / sizeof(command_mapping)) //The number of commands available in the program
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
+    int ret = 0;
 
     //week 9 : initializing vips and shutting it down after the execution
     if (VIPS_INIT(argv[0])) {
@@ -58,30 +60,27 @@ int main(int argc, char *argv[]) {
     argc--;
     argv++; // skips command call name
 
+    // Loop through all defined commands
     for (int i = 0; i < NB_COMMANDS; ++i) {
+        ret = ERR_INVALID_COMMAND;
+        //search for the command name
         if (strcmp(argv[0], commands[i].name) == 0) {
             // Call the command function
             argc--;
             argv++;
 
-            //CHANGES ZAC 24.04 ================================================================================
+            ret = commands[i].command_function(argc, argv);
 
-            int ret = commands[i].command_function(argc, argv);
+            break;
 
-            if (ret != ERR_NONE) {
-                //CHANGE ZAC : deleted ret reassignment.
-                fprintf(stderr, "ERROR: %s\n", ERR_MSG(ret));
-                help(0, NULL);
-            }
-
-            return ret;
         }
     }
 
-    fprintf(stderr, "ERROR: %s\n", ERR_MSG(ERR_INVALID_COMMAND));
-    help(0,NULL);
-    return ERR_INVALID_COMMAND;
-
-    //=====================================================================================================
+    //If command execution returns an error, show the error message and print help dialog
+    if (ret ) {
+        fprintf(stderr, "ERROR: %s\n", ERR_MSG(ret));
+        help(argc, argv);
+    }
+    return ret;
 
 }
