@@ -39,7 +39,10 @@ LDFLAGS  += -fsanitize=address
 LDLIBS   += -fsanitize=address
 
 CFLAGS   += -DWEEK=12
+CFLAGS += $(shell pkg-config vips --cflags)
 
+# Add the library to the linker
+LDLIBS += $(shell pkg-config vips --libs)
 ifdef DEBUG
 # add the debug flag, may need to comment this line when doing make feedback
 #TODO : Make feedback should build with -UDEBUG
@@ -54,12 +57,6 @@ SRCS = $(filter-out $(EXCLUDE_SRCS), $(wildcard *.c))
 LDLIBS += -lm -lssl -lcrypto
 
 OBJS=$(subst .c,.o,$(SRCS))
-
-# Add options for the compiler to include the library's headers
-CFLAGS += $(shell pkg-config vips --cflags)
-
-# Add the library to the linker
-LDLIBS += $(shell pkg-config vips --libs)
 
 all:: all-deferred
 
@@ -88,8 +85,6 @@ endif
 ifneq (,$(wildcard ./http-test-server.c))
 TARGETS += http-test-server
 endif
-
-
 
 all-deferred:: $(TARGETS)
 
@@ -131,8 +126,6 @@ $(TEST_DIR)/unit/%:
 
 
 
-
-
 dbg: $(TEST_DIR)/unit/$(EXE)
 ifndef TEST
 	$(error Missing test name)
@@ -141,11 +134,11 @@ ifndef EXE
 	$(error Missing executable name)
 endif
 	gdb -ex 'set debuginfod enabled off' \
-	    -ex 'cd ../provided/tests/unit/' \
+	    -ex 'cd $(TEST_DIR)/unit/' \
 	    -ex 'set environment CK_FORK=no' \
 	    -ex 'break $(TEST)' -ex 'run'    \
 	    -ex 'n' -ex 'layout src'         \
-	    '$(PWD)/../provided/tests/unit/unit-test-$(EXE)'
+	    '$(TEST_DIR)/unit/unit-test-$(EXE)'
 
 define e2e_test
 robot -v srcdir:$(PWD) -v datadir:$(TEST_DIR)/data $(TEST_DIR)/end-to-end/$1 ;
@@ -153,6 +146,7 @@ endef
 end2end-tests: $(TARGETS)
 	$(call e2e_test,week07.robot)
 	$(call e2e_test,week08.robot)
+	$(call e2e_test,week10.robot)
 
 check: end2end-tests unit-tests
 
