@@ -22,6 +22,10 @@ static const uint16_t default_small_res = 256;
 static const uint16_t MAX_THUMB_RES = 128;
 static const uint16_t MAX_SMALL_RES = 512;
 
+static void create_name(const char* img_id, int resolution, char** new_name);
+static int write_disk_image(const char *filename, const char *image_buffer, uint32_t image_size);
+static int read_disk_image(const char *path, char **image_buffer, uint32_t *image_size);
+
 /**********************************************************************
  * Displays some explanations.
  ********************************************************************** */
@@ -41,6 +45,10 @@ int help(int useless _unused, char **useless_too _unused)
            "          -small_res <X_RES> <Y_RES>: resolution for small images.\n"
            "                                  default value is %ux%u\n"
            "                                  maximum value is %ux%u\n"
+           "  read   <imgFS_filename> <imgID> [original|orig|thumbnail|thumb|small]:\n"
+           "      read an image from the imgFS and save it to a file.\n"
+           "      default resolution is \"original\".\n"
+           "  insert <imgFS_filename> <imgID> <filename>: insert a new image in the imgFS.\n"
            "  delete <imgFS_filename> <imgID>: delete image imgID from imgFS.\n",
            default_max_files,
            default_thumb_res, default_thumb_res,
@@ -232,3 +240,97 @@ int do_delete_cmd(int argc, char **argv)
     //Everything went well
     return ERR_NONE;
 }
+
+
+/**********************************************************************
+ * Reads an image from the imgFS and writes it to a separate image file.
+ */
+int do_read_cmd(int argc, char **argv)
+{
+    M_REQUIRE_NON_NULL(argv);
+    if (argc != 2 && argc != 3) return ERR_NOT_ENOUGH_ARGUMENTS;
+
+    const char * const img_id = argv[1];
+
+    const int resolution = (argc == 3) ? resolution_atoi(argv[2]) : ORIG_RES;
+    if (resolution == -1) return ERR_RESOLUTIONS;
+
+    struct imgfs_file myfile;
+    zero_init_var(myfile);
+    int error = do_open(argv[0], "rb+", &myfile);
+    if (error != ERR_NONE) return error;
+
+    char *image_buffer = NULL;
+    uint32_t image_size = 0;
+    error = do_read(img_id, resolution, &image_buffer, &image_size, &myfile);
+    do_close(&myfile);
+    if (error != ERR_NONE) {
+        return error;
+    }
+
+    // Extracting to a separate image file.
+    char* tmp_name = NULL;
+    create_name(img_id, resolution, &tmp_name);
+    if (tmp_name == NULL) return ERR_OUT_OF_MEMORY;
+    error = write_disk_image(tmp_name, image_buffer, image_size);
+    free(tmp_name);
+    free(image_buffer);
+
+    return error;
+}
+
+
+/**********************************************************************
+ * Inserts an image into the imgFS.
+ */
+int do_insert_cmd(int argc, char **argv)
+{
+    M_REQUIRE_NON_NULL(argv);
+    if (argc != 3) return ERR_NOT_ENOUGH_ARGUMENTS;
+
+    struct imgfs_file myfile;
+    zero_init_var(myfile);
+    int error = do_open(argv[0], "rb+", &myfile);
+    if (error != ERR_NONE) return error;
+
+    char *image_buffer = NULL;
+    uint32_t image_size;
+
+    // Reads image from the disk.
+    error = read_disk_image (argv[2], &image_buffer, &image_size);
+    if (error != ERR_NONE) {
+        do_close(&myfile);
+        return error;
+    }
+
+    error = do_insert(image_buffer, image_size, argv[1], &myfile);
+    free(image_buffer);
+    do_close(&myfile);
+    return error;
+}
+
+/**********************************************************************
+ * Create a new name for the image file.
+ */
+static void create_name(const char* img_id, int resolution, char** new_name) {
+
+}
+
+/**********************************************************************
+ * Write the content of a buffer of size provided, to a file of name provided.
+ */
+static int write_disk_image(const char *filename, const char *image_buffer, uint32_t image_size) {
+
+}
+
+
+
+/**********************************************************************
+ * Read content of file to buffer.
+ */
+static int read_disk_image(const char *path, char **image_buffer, uint32_t *image_size) {
+
+}
+
+
+
