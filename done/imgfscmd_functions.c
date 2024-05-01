@@ -313,6 +313,7 @@ int do_insert_cmd(int argc, char **argv)
  * Create a new name for the image file.
  */
 static void create_name(const char* img_id, int resolution, char** new_name) {
+
     const char* resolution_str = NULL;
 
     switch (resolution) {
@@ -338,6 +339,9 @@ static void create_name(const char* img_id, int resolution, char** new_name) {
  */
 static int write_disk_image(const char *filename, const char *image_buffer, uint32_t image_size) {
 
+    M_REQUIRE_NON_NULL(filename);
+    M_REQUIRE_NON_NULL(image_buffer);
+
     FILE *file = fopen(filename, "wb");
     if (!file) {
         return ERR_IO; // error file
@@ -359,6 +363,11 @@ static int write_disk_image(const char *filename, const char *image_buffer, uint
  * Read content of file to buffer.
  */
 static int read_disk_image(const char *path, char **image_buffer, uint32_t *image_size) {
+
+    M_REQUIRE_NON_NULL(path);
+    M_REQUIRE_NON_NULL(image_buffer);
+    M_REQUIRE_NON_NULL(image_size);
+
     FILE *file = fopen(path, "rb");
     if (!file) {
         return ERR_IO;
