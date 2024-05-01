@@ -17,8 +17,8 @@ int do_insert(const char *image_buffer, size_t image_size,
 
     //Find empty entry index in metadata table
     uint32_t free_idx = -1;
-    while(++free_idx < imgfs_file->header.max_files && imgfs_file->metadata[free_idx].is_valid != EMPTY);
-    if(free_idx == -1) return ERR_OUT_OF_MEMORY;
+    while(++free_idx < imgfs_file->header.max_files && !imgfs_file->metadata[free_idx].is_valid);
+    if(free_idx == -1) return ERR_IMGFS_FULL;
 
     SHA256((const unsigned char *)image_buffer, image_size, imgfs_file->metadata[free_idx].SHA);
     strncpy(imgfs_file->metadata[free_idx].img_id, img_id, MAX_IMG_ID);
@@ -26,17 +26,14 @@ int do_insert(const char *image_buffer, size_t image_size,
 
     //Put correct height and width in the image's metadata (see image_content.h #get_resolution())
     int ret_resolution = get_resolution(&imgfs_file->metadata[free_idx].orig_res[0],
-                                       &imgfs_file->metadata[free_idx].orig_res[1],
-                                       image_buffer, image_size);
+                                        &imgfs_file->metadata[free_idx].orig_res[1],
+                                        image_buffer, image_size);
     if(ret_resolution != ERR_NONE) {
         return ret_resolution;
     }
 
     // Remove duplicates
     int ret_dedup = do_name_and_content_dedup(imgfs_file, free_idx);
-    if (ret_dedup != ERR_NONE) {
-        return ret_dedup;
-    }
 
     //Check whether dedup has found a duplicate (see bottom of image_dedup.c #do_name_and_content_dedup())
     if(imgfs_file->metadata[free_idx].offset[ORIG_RES] != 0) {
@@ -44,15 +41,21 @@ int do_insert(const char *image_buffer, size_t image_size,
     }
 
     //If no duplicates were found, write the image to the end of the file
+    printf("Attempting to insert: %s with index %u\n", img_id, free_idx);
+    if (ret_dedup != ERR_NONE) {
+        printf("Deduplication error: %d\n", ret_dedup);
+        return ret_dedup;
+    }
+
+
+    fseek(imgfs_file->file, 0, SEEK_END);
+    if(fwrite(image_buffer, image_size, 1, imgfs_file->file) != -1) {
+        return ERR_IO;
+    }
 
     //finish initializing the metadata
     imgfs_file->metadata[free_idx].offset[ORIG_RES] = ftell(imgfs_file->file);
     imgfs_file->metadata[free_idx].is_valid = NON_EMPTY;
-
-    fseek(imgfs_file->file, 0, SEEK_END);
-    if(fwrite(image_buffer, image_size, 1, imgfs_file->file) != image_size) {
-        return ERR_IO;
-    }
 
     //Update all the necessary image database header fields.
     imgfs_file->header.nb_files++;

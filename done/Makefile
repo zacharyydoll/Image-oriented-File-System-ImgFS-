@@ -31,6 +31,8 @@ CFLAGS += -Wextra -Wfloat-equal -Wshadow -Wpointer-arith -Wbad-function-cast -Ww
 
 CFLAGS += -Wcast-align
 
+CFLAGS += $(shell pkg-config vips --cflags)
+
 ## may require: export ASAN_OPTIONS=allocator_may_return_null=1
 #               export ASAN_OPTIONS=verify_asan_link_order=0
 # different -fsanitize options are available, including -fmemory
@@ -38,11 +40,9 @@ CPPFLAGS += -fsanitize=address
 LDFLAGS  += -fsanitize=address
 LDLIBS   += -fsanitize=address
 
-CFLAGS   += -DWEEK=12
-CFLAGS += $(shell pkg-config vips --cflags)
-
-# Add the library to the linker
 LDLIBS += $(shell pkg-config vips --libs)
+CFLAGS   += -DWEEK=12
+
 ifdef DEBUG
 # add the debug flag, may need to comment this line when doing make feedback
 #TODO : Make feedback should build with -UDEBUG
