@@ -2,14 +2,10 @@ cmake_minimum_required(VERSION 3.27)
 project(cs202_24_prj_sophie_zac)
 
 set(CMAKE_CXX_STANDARD 14)
+#set(CMAKE_OSX_ARCHITECTURES arm64)
 
-include_directories(provided/src)
-include_directories(provided/tests/unit)
-include_directories(/usr/include/glib-2.0)
-include_directories(/usr/lib/x86_64-linux-gnu/glib-2.0/include)
-
+# Define the executable target
 add_executable(cs202_24_prj_sophie_zac
-
         done/error.c
         done/error.h
         done/http_net.h
@@ -25,10 +21,6 @@ add_executable(cs202_24_prj_sophie_zac
         done/socket_layer.h
         done/util.c
         done/util.h
-
-
-        provided/handouts/01.imgfs.md
-        provided/handouts/01.main.md
         provided/src/error.c
         provided/src/error.h
         provided/src/http-test-server.c
@@ -45,15 +37,40 @@ add_executable(cs202_24_prj_sophie_zac
         provided/src/socket_layer.h
         provided/src/util.c
         provided/src/util.h
-        provided/tests/unit/test.h
-        provided/tests/unit/unit-test-imgfslist.c
-        provided/tests/unit/unit-test-imgfsstruct.c
-        provided/tests/unit/unit-test-imgfstools.c
         done/image_content.c
         done/imgfs_create.c
         done/imgfs_delete.c
-        provided/tests/unit/unit-test-imgfscreate.c
         done/image_dedup.c
-
-
+        done/imgfs_insert.c
+        done/imgfs_read.c
 )
+
+# Specify directories to include during the build process
+target_include_directories(cs202_24_prj_sophie_zac PRIVATE
+        provided/src
+        provided/tests/unit
+        /usr/include/glib-2.0
+        /usr/local/opt/glib/include/glib-2.0
+        /usr/local/opt/glib/lib/glib-2.0/include
+        /usr/lib/x86_64-linux-gnu/glib-2.0/include
+        /usr/local/opt/openssl@3/include
+        /usr/local/opt/vips/include
+)
+
+# Specify the directories where the linker should look for libraries
+target_link_directories(cs202_24_prj_sophie_zac PRIVATE
+        /usr/local/opt/openssl@3/lib
+        /usr/local/opt/glib/lib
+        /usr/local/opt/vips/lib
+)
+
+# Link libraries
+target_link_libraries(cs202_24_prj_sophie_zac
+        ssl
+        crypto
+        glib-2.0
+        vips.42
+        vips-cpp.42)
+
+#set_target_properties(cs202_24_prj_sophie_zac PROPERTIES
+        #OSX_ARCHITECTURES arm64)

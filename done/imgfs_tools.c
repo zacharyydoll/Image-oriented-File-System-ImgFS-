@@ -101,6 +101,25 @@ ORIGINAL: %"
     printf("*****************************************\n");
 }
 
+
+/*******************************************************************
+ * Resolution string to resolution enum.
+ */
+int resolution_atoi (const char* str) {
+    if (str == NULL) return -1;
+
+    if (!strcmp(str, "thumb") || !strcmp(str, "thumbnail")) {
+        return THUMB_RES;
+    } else if (!strcmp(str, "small")) {
+        return SMALL_RES;
+    } else if (!strcmp(str, "orig")  || !strcmp(str, "original")) {
+        return ORIG_RES;
+    }
+    return -1;
+}
+
+
+
 int do_open(const char* imgfs_filename,const char* open_mode,struct imgfs_file* imgfs_file)
 {
 

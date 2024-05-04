@@ -4,8 +4,7 @@
 #include "image_content.h"
 #include <vips/vips.h>
 
-int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index)
-{
+int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
     //File validity check
     M_REQUIRE_NON_NULL(imgfs_file);
 
@@ -108,8 +107,8 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index)
     long end_offset = ftell(imgfs_file->file);
 
 
-    imgfs_file->metadata[index].offset[resolution] = end_offset - buffer_size;
-    imgfs_file->metadata[index].size[resolution] = buffer_size;
+    imgfs_file->metadata[index].offset[resolution] = (uint64_t) ((uint64_t) end_offset - buffer_size);
+    imgfs_file->metadata[index].size[resolution] = (uint32_t) buffer_size;
     imgfs_file->metadata[index].is_valid = 1; // Mark the image as valid
 
     // Writing metadata changes to disk
@@ -131,5 +130,28 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index)
 
 
     // Everything went well
+    return ERR_NONE;
+}
+
+//======================================================================================================================
+
+int get_resolution(uint32_t *height, uint32_t *width,
+                   const char *image_buffer, size_t image_size) {
+    M_REQUIRE_NON_NULL(height);
+    M_REQUIRE_NON_NULL(width);
+    M_REQUIRE_NON_NULL(image_buffer);
+
+    VipsImage* original = NULL;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-qual"
+    const int err = vips_jpegload_buffer((void*) image_buffer, image_size,
+                                         &original, NULL);
+#pragma GCC diagnostic pop
+    if (err != ERR_NONE) return ERR_IMGLIB;
+
+    *height = (uint32_t) vips_image_get_height(original);
+    *width  = (uint32_t) vips_image_get_width (original);
+
+    g_object_unref(VIPS_OBJECT(original));
     return ERR_NONE;
 }
