@@ -164,6 +164,7 @@ int do_create_cmd(int argc, char **argv)
         }
     }
 
+
     // =====================================================================================================================
 
     // Initializing imgfs_file structure with the given parameters to call do_create
