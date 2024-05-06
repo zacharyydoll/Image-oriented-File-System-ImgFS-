@@ -13,8 +13,12 @@ int do_read(const char *img_id, int resolution, char **image_buffer,
 
     //find entry in metadata corresponding to supplied imgID
     uint32_t imgID_idx = -1;
-    while(++imgID_idx < imgfs_file->header.max_files &&
-          strncmp(imgfs_file->metadata[imgID_idx].img_id, img_id, MAX_IMG_ID) != 0);
+    //CHANGE_SARA changed the while to for to unsure break to pass test
+    for (imgID_idx = -1; imgID_idx < imgfs_file->header.max_files; ++imgID_idx) {
+        if (strncmp(imgfs_file->metadata[imgID_idx].img_id, img_id, MAX_IMG_ID) == 0) {
+            break;
+        }
+    }
 
     //case where no corresponding imgID was found in metadata table
     if(imgID_idx == -1) {

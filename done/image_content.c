@@ -142,11 +142,11 @@ int get_resolution(uint32_t *height, uint32_t *width,
     M_REQUIRE_NON_NULL(image_buffer);
 
     VipsImage* original = NULL;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-qual"
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wcast-qual"
     const int err = vips_jpegload_buffer((void*) image_buffer, image_size,
                                          &original, NULL);
-#pragma GCC diagnostic pop
+    #pragma GCC diagnostic pop
     if (err != ERR_NONE) return ERR_IMGLIB;
 
     *height = (uint32_t) vips_image_get_height(original);

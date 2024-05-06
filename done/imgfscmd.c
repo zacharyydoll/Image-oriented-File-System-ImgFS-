@@ -37,6 +37,9 @@ command_mapping commands[] = {
     {"list",   do_list_cmd},
     {"create", do_create_cmd},
     {"delete", do_delete_cmd},
+    {"insert", do_insert_cmd},
+    {"read", do_read_cmd},
+
 };
 
 #define NB_COMMANDS (sizeof(commands) / sizeof(command_mapping)) //The number of commands available in the program
@@ -49,7 +52,7 @@ int main(int argc, char *argv[])
     if (VIPS_INIT(argv[0])) {
         vips_error_exit("unable to start VIPS");
     }
-    vips_shutdown();
+
 
 
 
@@ -79,8 +82,9 @@ int main(int argc, char *argv[])
     //If command execution returns an error, show the error message and print help dialog
     if (ret ) {
         fprintf(stderr, "ERROR: %s\n", ERR_MSG(ret));
-        help(argc, argv);
+        //help(argc, argv);
     }
+    vips_shutdown();
     return ret;
 
 }

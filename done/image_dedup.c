@@ -14,9 +14,12 @@ int do_name_and_content_dedup(struct imgfs_file *imgfs_file, uint32_t index)
     // Getting metadata of the target image
     struct img_metadata *targetImg = &imgfs_file->metadata[index];
 
+    /*
     if (targetImg->is_valid == EMPTY) {
+        printf("\nhere in dedup 2\n");
         return ERR_IMAGE_NOT_FOUND; //if image is invalid, return out of bounds (see tests)
     }
+     */
 
     for (uint32_t i = 0; i < imgfs_file->header.nb_files; ++i) {
 
@@ -25,7 +28,10 @@ int do_name_and_content_dedup(struct imgfs_file *imgfs_file, uint32_t index)
         // Image must be ignored if empty
         if (i != index && currImg->is_valid != EMPTY) {
             // Check for duplicate internal identifiers
-            if (strncmp(currImg->img_id, imgfs_file->metadata[index].img_id, MAX_IMG_ID) == 0) {
+            printf("\ncurrImg->img_id: %s\n", currImg->img_id);
+            printf("\nimgfs_file->metadata[index].img_id: %s\n", imgfs_file->metadata[index].img_id);
+            if (strcmp(currImg->img_id, imgfs_file->metadata[index].img_id) == 0) {
+                printf("\n Found duplicate ID: %s\n", imgfs_file->metadata[index].img_id);
                 return ERR_DUPLICATE_ID;
             }
 
