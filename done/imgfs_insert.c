@@ -57,18 +57,19 @@ int do_insert(const char *image_buffer, size_t image_size,
         return ret_dedup;
     }
 
-    if (fseek(imgfs_file->file, 0, SEEK_END) != 0){
-        return ERR_IO;
-    }
-    //change
-    if(fwrite(image_buffer, image_size, 1, imgfs_file->file) != 1) {
-        return ERR_IO;
-    }
 
-    //CHANGE_SARA : correctly calculating the right offset
-    long end_offset = ftell(imgfs_file->file);
+
+    //CHANGE_SARA : correctly calculating the right offset in case there was a deduplication
     //finish initializing the metadata
     if(imgfs_file->metadata[free_idx].offset[ORIG_RES] == 0) { //not sure abt this but only way to make a test pass
+        if (fseek(imgfs_file->file, 0, SEEK_END) != 0){
+            return ERR_IO;
+        }
+        //change
+        if(fwrite(image_buffer, image_size, 1, imgfs_file->file) != 1) {
+            return ERR_IO;
+        }
+        long end_offset = ftell(imgfs_file->file);
         imgfs_file->metadata[free_idx].offset[ORIG_RES] = (uint64_t) ((uint64_t) end_offset - image_size);
     }
     imgfs_file->metadata[free_idx].is_valid = NON_EMPTY;
