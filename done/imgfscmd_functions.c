@@ -264,12 +264,14 @@ int do_read_cmd(int argc, char **argv)
     char *image_buffer = NULL;
     uint32_t image_size = 0;
     error = do_read(img_id, resolution, &image_buffer, &image_size, &myfile);
+
     do_close(&myfile);
     if (error != ERR_NONE) {
         return error;
     }
 
     // Extracting to a separate image file.
+    printf("here !\n");
     char* tmp_name = NULL;
     create_name(img_id, resolution, &tmp_name);
     if (tmp_name == NULL) return ERR_OUT_OF_MEMORY;
@@ -332,7 +334,14 @@ static void create_name(const char* img_id, int resolution, char** new_name) {
     }
 
     //format : image_id + resolution_suffix + '.jpg' + '\0' (see handout)
-    *new_name = malloc(strlen(img_id) + strlen(resolution_str) + strlen(".jpg") + 1);
+    //CHANGE_SARA : using calloc instead and breaking id not enough memory
+    *new_name = calloc(strlen(img_id) + strlen(resolution_str) + strlen(".jpg") + 1, sizeof(char));
+    if (*new_name == NULL) {
+        return ; // out of memory
+    }
+
+    //CHANGE_SARA :using sprintf to update filename
+    sprintf(*new_name, "%s%s.jpg", img_id, resolution_str);
 }
 
 /**********************************************************************
@@ -343,17 +352,23 @@ static int write_disk_image(const char *filename, const char *image_buffer, uint
     M_REQUIRE_NON_NULL(filename);
     M_REQUIRE_NON_NULL(image_buffer);
 
+    printf("before open file ");
     FILE *file = fopen(filename, "wb");
-    if (!file) {
-        return ERR_IO; // error file
+    printf("after open file ");
+
+    printf("Debugging: filename is: %s\n", filename);
+
+    printf("before file not found \n");
+    size_t written_bytes = fwrite(image_buffer, 1, image_size, file);
+    printf("after file not found \n");
+    if (written_bytes != image_size) {
+        fclose(file);
+        return ERR_IO;
     }
 
-    uint32_t written = fwrite(image_buffer, 1, image_size, file);
     fclose(file);
 
-    if (written != image_size) {
-        return ERR_IO; // error writing the full buffer
-    }
+
 
     return ERR_NONE;
 }

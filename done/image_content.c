@@ -122,6 +122,8 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
         return ERR_IO;
     }
 
+    fflush(imgfs_file->file);
+
     // Cleanup
     g_object_unref(orig_image);
     g_object_unref(resized_image);
