@@ -43,6 +43,8 @@ add_executable(cs202_24_prj_sophie_zac
         done/image_dedup.c
         done/imgfs_insert.c
         done/imgfs_read.c
+        done/http_net.c
+        done/http_net.c
 )
 
 # Specify directories to include during the build process
