@@ -122,8 +122,8 @@ int http_reply(int connection, const char* status, const char* headers, const ch
     if (!buffer) return ERR_OUT_OF_MEMORY;
 
     // build header with format from handout (see https://www.geeksforgeeks.org/snprintf-c-library/)
-    snprintf(buffer, total_size, "%s%s%sContent-Length: %zu%s",
-             HTTP_PROTOCOL_ID, status, headers, body_len, HTTP_HDR_END_DELIM);
+    snprintf(buffer, total_size + 1, "%s %s\r\n%sContent-Length: %zu\r\n\r\n",
+             HTTP_PROTOCOL_ID, status, headers, body_len);
 
     // add body to the end of the buffer
     if (body && body_len > 0) {

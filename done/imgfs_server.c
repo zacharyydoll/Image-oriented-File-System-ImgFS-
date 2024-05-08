@@ -48,6 +48,7 @@ int main (int argc, char *argv[]) {
     if (err < 0) {
         fprintf(stderr, "http_init() failed\n");
         fprintf(stderr, "%s\n", ERR_MSG(err));
+        server_shutdown();
         return err;
     }
 
