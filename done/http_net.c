@@ -112,17 +112,23 @@ int http_serve_file(int connection, const char* filename) {
  * Create and send HTTP reply
  */
 int http_reply(int connection, const char* status, const char* headers, const char *body, size_t body_len) {
+    M_REQUIRE_NON_NULL(status);
+    M_REQUIRE_NON_NULL(headers);
+
+    if(body == NULL && body_len > 0) {
+        return ERR_INVALID_ARGUMENT; // body can be null for responses with empty body, but then length should be 0
+    }
 
     // compute required buffer size
-    size_t header_len = strlen(HTTP_PROTOCOL_ID) + strlen(status) + strlen(HTTP_LINE_DELIM) +
-                        strlen(headers) + 50; //50 for "Content-Length: ", length + delimiters
-    size_t total_size = header_len + body_len + strlen(HTTP_HDR_END_DELIM);
+    size_t est_header_len = strlen(HTTP_PROTOCOL_ID) + strlen(status) + strlen(HTTP_LINE_DELIM) +
+                        strlen(headers) + 50; //counted about 50 for "Content-Length: " and length + delimiters
+    size_t max_total_size = est_header_len + body_len + strlen(HTTP_HDR_END_DELIM);
 
-    char *buffer = malloc(total_size + 1);  // +1 for null terminator
+    char *buffer = malloc(max_total_size + 1);  // +1 for null terminator
     if (!buffer) return ERR_OUT_OF_MEMORY;
 
-    // build header with format from handout (see https://www.geeksforgeeks.org/snprintf-c-library/)
-    snprintf(buffer, total_size + 1, "%s %s\r\n%sContent-Length: %zu\r\n\r\n",
+    // header with format from handout (see https://www.geeksforgeeks.org/snprintf-c-library/)
+    snprintf(buffer, max_total_size + 1, "%s %s\r\n%sContent-Length: %zu\r\n\r\n",
              HTTP_PROTOCOL_ID, status, headers, body_len);
 
     // add body to the end of the buffer
