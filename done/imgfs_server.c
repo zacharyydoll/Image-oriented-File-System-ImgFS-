@@ -17,8 +17,9 @@
 #include <stdlib.h> // abort()
 
 /********************************************************************/
-static void signal_handler(int sig_num _unused)
-{
+static void signal_handler(int sig_num _unused) {
+    server_shutdown();
+    exit(0);
 }
 
 /********************************************************************/
@@ -38,10 +39,11 @@ static void set_signal_handler(void)
     }
 }
 
-/********************************************************************/
+/******************************* *************************************/
 
-int main (int argc, char *argv[])
-{
+int main (int argc, char *argv[]) {
+
+    set_signal_handler();
     int err = server_startup(argc, argv);
     if (err < 0) {
         fprintf(stderr, "http_init() failed\n");
