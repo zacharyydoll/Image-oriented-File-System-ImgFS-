@@ -175,6 +175,13 @@ build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/http_net.c.o: C_COMPILER__cs20
   OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
   OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/done
 
+build CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfs_server_service.c.o: C_COMPILER__cs202_24_prj_sophie_zac_unscanned_Debug /Users/Zachary/Desktop/BA4/CompSys/cs202-24-prj-sophie-zac/provided/src/imgfs_server_service.c || cmake_object_order_depends_target_cs202_24_prj_sophie_zac
+  DEP_FILE = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfs_server_service.c.o.d
+  FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fcolor-diagnostics
+  INCLUDES = -I/Users/Zachary/Desktop/BA4/CompSys/cs202-24-prj-sophie-zac/provided/src -I/Users/Zachary/Desktop/BA4/CompSys/cs202-24-prj-sophie-zac/provided/tests/unit -I/usr/include/glib-2.0 -I/usr/local/opt/glib/include/glib-2.0 -I/usr/local/opt/glib/lib/glib-2.0/include -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/local/opt/openssl@3/include -I/usr/local/opt/vips/include
+  OBJECT_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir
+  OBJECT_FILE_DIR = CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target cs202_24_prj_sophie_zac
@@ -183,7 +190,7 @@ build CMakeFiles/cs202_24_prj_sophie_zac.dir/done/http_net.c.o: C_COMPILER__cs20
 #############################################
 # Link the executable cs202_24_prj_sophie_zac
 
-build cs202_24_prj_sophie_zac: C_EXECUTABLE_LINKER__cs202_24_prj_sophie_zac_Debug CMakeFiles/cs202_24_prj_sophie_zac.dir/done/error.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_tools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfscmd.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfscmd_functions.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/util.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/error.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/http-test-server.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfs_tools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd_functions.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/util.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/image_content.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_create.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_delete.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/image_dedup.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_insert.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_read.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/http_net.c.o
+build cs202_24_prj_sophie_zac: C_EXECUTABLE_LINKER__cs202_24_prj_sophie_zac_Debug CMakeFiles/cs202_24_prj_sophie_zac.dir/done/error.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_tools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfscmd.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfscmd_functions.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/util.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/error.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/http-test-server.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfs_tools.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfscmd_functions.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/util.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/image_content.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_create.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_delete.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/image_dedup.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_insert.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/imgfs_read.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/done/http_net.c.o CMakeFiles/cs202_24_prj_sophie_zac.dir/provided/src/imgfs_server_service.c.o
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
   LINK_LIBRARIES = -Wl,-rpath,/usr/local/opt/openssl@3/lib -Wl,-rpath,/usr/local/opt/glib/lib -Wl,-rpath,/usr/local/opt/vips/lib  -lssl  -lcrypto  -lglib-2.0  -lvips.42  -lvips-cpp.42
   LINK_PATH = -L/usr/local/opt/openssl@3/lib   -L/usr/local/opt/glib/lib   -L/usr/local/opt/vips/lib
