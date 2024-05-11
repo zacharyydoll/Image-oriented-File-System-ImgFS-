@@ -1,6 +1,11 @@
+#define IN_CS202_UNIT_TEST
 #include "http_prot.h"
 #include <check.h>
 #include "test.h"
+
+const char *get_next_token(const char *message, const char *delimiter, struct http_string *output);
+const char *http_parse_headers(const char *header_start, struct http_message *output);
+
 
 #define ck_assert_http_str_eq(str, expect) \
     ck_assert_msg(strncmp(str.val, expect, str.len) == 0 && strlen(expect) == str.len, \
@@ -93,6 +98,84 @@ END_TEST
 
 
 
+START_TEST(test_get_next_token) {
+    struct http_string output;
+    const char *remainder;
+
+    char tempBuffer[1024]; // Ensure this is large enough for your tests
+
+    //======================================================
+
+    remainder = get_next_token("abcdefg", "de", &output);
+    memcpy(tempBuffer, output.val, output.len);
+    tempBuffer[output.len] = '\0';
+
+    ck_assert_str_eq(tempBuffer, "abc");
+    ck_assert_int_eq(output.len, 3);
+    ck_assert_str_eq(remainder, "fg");
+
+    //======================================================
+
+    remainder = get_next_token("Content-Length: 0\r\nAccept: */*", ": ", &output);
+    memcpy(tempBuffer, output.val, output.len);
+    tempBuffer[output.len] = '\0';
+
+    ck_assert_str_eq(tempBuffer, "Content-Length");
+    ck_assert_int_eq(output.len, strlen("Content-Length"));
+    ck_assert_str_eq(remainder, "0\r\nAccept: */*");
+}
+END_TEST
+
+
+
+START_TEST(test_http_parse_headers) {
+    struct http_message msg;
+    const char *header_str = "Host: localhost:8000\r\nUser-Agent: curl/8.5.0\r\nAccept: */*\r\n\r\n";
+    const char *result;
+
+    result = http_parse_headers(header_str, &msg);
+    ck_assert_int_eq(msg.num_headers, 3);
+    ck_assert_str_eq(msg.headers[0].key.val, "Host");
+    ck_assert_str_eq(msg.headers[0].value.val, "localhost:8000");
+    ck_assert_str_eq(msg.headers[1].key.val, "User-Agent");
+    ck_assert_str_eq(msg.headers[1].value.val, "curl/8.5.0");
+    ck_assert_str_eq(msg.headers[2].key.val, "Accept");
+    ck_assert_str_eq(msg.headers[2].value.val, "*/*");
+    ck_assert_ptr_eq(result, header_str + strlen(header_str)); // Expect to point at the end of headers
+}
+END_TEST
+
+
+
+START_TEST(test_http_parse_message_complete) {
+    struct http_message msg;
+    int content_len;
+    const char *message = "Host: localhost:8000\r\nContent-Length: 10\r\n\r\n1234567890";
+    int result = http_parse_message(message, strlen(message), &msg, &content_len);
+
+    ck_assert_int_eq(result, 1); // Fully parsed message
+    ck_assert_int_eq(content_len, 10);
+    ck_assert_int_eq(msg.body.len, 10);
+    ck_assert_str_eq(msg.body.val, "1234567890");
+}
+END_TEST
+
+
+
+START_TEST(test_http_parse_message_incomplete_body) {
+    struct http_message msg;
+    int content_len;
+    const char *message = "Host: localhost:8000\r\nContent-Length: 10\r\n\r\n1234";
+    int result = http_parse_message(message, strlen(message), &msg, &content_len);
+
+    ck_assert_int_eq(result, 0); // Incomplete body
+    ck_assert_int_eq(content_len, 10);
+    ck_assert_int_eq(msg.body.len, 0); // No body parsed
+}
+END_TEST
+
+
+
 Suite* http_suite(void) {
     Suite *s = suite_create("HTTP Protocol Handling");
 
@@ -101,10 +184,16 @@ Suite* http_suite(void) {
     tcase_add_test(tc_core, test_http_get_var_not_found);
     tcase_add_test(tc_core, test_http_get_var_found);
     tcase_add_test(tc_core, test_http_get_var_not_found);
+    tcase_add_test(tc_core, test_get_next_token);
+    tcase_add_test(tc_core, test_http_parse_headers);
+    tcase_add_test(tc_core, test_http_parse_message_complete);
+    tcase_add_test(tc_core, test_http_parse_message_incomplete_body);
+
     suite_add_tcase(s, tc_core);
 
     return s;
 }
+
 
 
 Suite *personal_week12_test()
@@ -115,6 +204,10 @@ Suite *personal_week12_test()
     Add_Test(s, test_http_match_verb_exact);
     Add_Test(s, test_http_get_var_found);
     Add_Test(s, test_http_get_var_not_found);
+    Add_Test(s, test_get_next_token);
+    Add_Test(s, test_http_parse_headers);
+    Add_Test(s, test_http_parse_message_complete);
+    Add_Test(s, test_http_parse_message_incomplete_body);
 
     return s;
 }

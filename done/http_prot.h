@@ -7,6 +7,12 @@
 
 #pragma once
 
+#ifdef IN_CS202_UNIT_TEST
+#define static_unless_test
+#else
+#define static_unless_test static
+#endif
+
 #define MAX_HEADERS 40
 
 #define HTTP_HDR_KV_DELIM  ": "
@@ -35,6 +41,10 @@ struct http_message {
     size_t num_headers;
     struct http_string body;
 };
+
+const char *get_next_token(const char *message, const char *delimiter, struct http_string *output);
+const char *http_parse_headers(const char *header_start, struct http_message *output);
+
 
 /**
  * @brief Checks whether the `message` URI starts with the provided `target_uri`.
