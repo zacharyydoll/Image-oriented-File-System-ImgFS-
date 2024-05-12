@@ -35,7 +35,7 @@ int server_startup (int argc, char **argv) {
         return ret_open;
     }
 
-    print_header(&fs_file);
+    print_header(&fs_file.header);
 
     //2nd argument is the port number and is optional. If present, use it.
     if (argc > 2) {
