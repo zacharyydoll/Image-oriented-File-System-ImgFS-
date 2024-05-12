@@ -1,80 +1,114 @@
+
+#include <arpa/inet.h> // inet_addr()
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <netinet/in.h>
 #include <string.h>
-#include <unistd.h>
-#include "socket_layer.h"
-#include "error.h"
+#include <strings.h> // bzero()
+#include <sys/socket.h>
+#include <unistd.h> // read(), write(), close()
+#define MAX 2048
+#define PORT 8080
+#define MAX_FILE_SIZE 1024
+#define SA struct sockaddr
+#define ACK "ACK"
+int send_file(int sockfd, char *file_path)
+{
+    char buffer[MAX];
 
 
-#define BUFFER_SIZE 2048
-#define DELIMITER '\0'
-#define EOF_DELIMITER "<EOF>"
-
-int main(int argc, char *argv[]) {
-    if (argc < 3) {
-        fprintf(stderr, "USAGE: %s port file\n", argv[0]);
-        return ERR_INVALID_ARGUMENT;
+    FILE *file = fopen(file_path, "r");
+    if (file == NULL)
+    {
+        perror("Error in opening file");
+        return -1;
     }
 
-    uint16_t server_port_num = atoi(argv[1]);
+    fseek(file, 0L, SEEK_END);
+    size_t file_size = ftell(file);
+    rewind(file);
 
-    char* file_path = argv[2];
-    printf("Talking to  %li\n", server_port_num);
+    if (file_size > MAX_FILE_SIZE)
+    {
+        fclose(file);
+        perror("File size is big");
+        return -1;
+    }
+    printf("Sending size %lu:\n",file_size);
+    sprintf(buffer, "%ld", file_size);
+    write(sockfd, buffer, MAX);
 
-    FILE* fp = fopen(file_path, "r");
-    if (fp == NULL) {
-        perror("Error opening file");
-        return ERR_IO;
+    bzero(buffer, MAX);
+    read(sockfd, buffer, MAX);
+    if (strcmp(buffer, ACK) != 0)
+    {
+        fclose(file);
+        perror("Acknowledgment not received");
+        return -1;
+    }
+    printf("Server responded: \"Small file\" \n");
+    bzero(buffer, MAX);
+
+    printf("Sending %s: \n",file_path);
+    while (fread(buffer, 1, MAX, file) > 0)
+    {
+        write(sockfd, buffer, MAX);
+        bzero(buffer, MAX);
     }
 
-    fseek(fp, 0, SEEK_END);
-    long filesize = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
+    read(sockfd, buffer, MAX);
+    if (strcmp(buffer, ACK) != 0)
+    {
+        fclose(file);
+        perror("Refused\n");
+        return -1;
+    }
+    printf("Accepted \n");
 
-    if (filesize > 2048) {
-        fprintf(stderr, "ERROR: File too large.\n");
-        return ERR_INVALID_ARGUMENT;
+    fclose(file);
+}
+
+int main(int argc, char *argv[]){
+    if (argc != 3)
+    {
+        printf("Usage: %s <port> <file>\n", argv[0]);
+        exit(0);
     }
 
-    printf("Sending size %li\n", filesize);
+    int sockfd, port;
+    struct sockaddr_in servaddr;
 
-    int socket_fd = tcp_server_init(server_port_num);
-    uint32_t network_byte_order_filesize = htonl(filesize);
-    tcp_send(socket_fd, (char*) &network_byte_order_filesize, sizeof(network_byte_order_filesize));
-    tcp_send(socket_fd, DELIMITER, sizeof(DELIMITER));  // Send delimiter
+    sscanf(argv[1], "%d", &port);
 
-    char response[2048+1];
-    ssize_t size_response_len = tcp_read(socket_fd, response, 2048);
-    if (tcp_read(socket_fd, response, sizeof(response)) < 0) {
-        return ERR_INVALID_ARGUMENT;
-    }
-    response[size_response_len] = '\0';
-    printf("Server responded: %s\n", response);
-
-    if (strcmp(response, "ACK SIZE TOO LARGE")==0) {
-        printf("Server rejected due to large file size\n");
-        fclose(fp);
-        close(socket_fd);
-        return 0;
-    }
-    printf("Sending %s\n", file_path);
-    char file_buffer[2048 + 1];
-
-    fread(file_buffer, 1, filesize, fp);
-    tcp_send(socket_fd, file_buffer, filesize);
-
-    ssize_t file_response_len = tcp_read(socket_fd, response, 2048);
-    response[file_response_len] = '\0';
-
-    if (strcmp(response, "ACK FILE RECEIVED")==0){
-        printf("Accepted\nDone\n");
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    // socket create and verification
+    if (sockfd == -1) {
+        printf("socket creation failed...\n");
+        exit(0);
     }
 
-    fclose(fp);
-    close(socket_fd);
+    bzero(&servaddr, sizeof(servaddr));
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servaddr.sin_port = htons(port);
 
-    return 0;
+    // connect the client socket to server socket
+    if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr))
+        != 0) {
+        perror("Connection with the server failed");
+        exit(0);
+    }
+
+    printf("Talking to %i \n",port);
+
+
+    // function for chat
+    send_file(sockfd, argv[2]) ;
+
+    printf("Done \n");
+
+
+
+
+    // close the socket
+    close(sockfd);
 }

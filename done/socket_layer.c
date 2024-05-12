@@ -19,6 +19,7 @@ int tcp_server_init(uint16_t port){
         close(socket_tcp);
         return ERR_IO;
     }
+    bzero(&server_addr, sizeof(server_addr));
     // Use Internet address family
     server_addr.sin_family = AF_INET;
     // Let socket choose the IP address
@@ -28,7 +29,7 @@ int tcp_server_init(uint16_t port){
 
 
     //Binding the socket
-    if (bind(socket_tcp, (struct sockaddr *) &server_addr, sizeof(server_addr)) < 0) {
+    if (bind(socket_tcp, (struct sockaddr *) &server_addr, sizeof(server_addr)) != 0) {
         perror("Error binding socket");
         close(socket_tcp);
         return ERR_IO;
@@ -41,9 +42,6 @@ int tcp_server_init(uint16_t port){
         return ERR_IO;
     }
 
-
-    printf("Server started on port %d\n", port);
-
     return socket_tcp;
 }
 
@@ -53,7 +51,7 @@ int tcp_accept(int passive_socket){
 
 ssize_t tcp_read(int active_socket, char* buf, size_t buflen){
     M_REQUIRE_NON_NULL(buf);
-    return read(active_socket,buf,buflen);
+    return recv(active_socket,buf,buflen,0);
 }
 
 ssize_t tcp_send(int active_socket, const char* response, size_t response_len){
