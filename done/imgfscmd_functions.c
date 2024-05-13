@@ -11,7 +11,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <inttypes.h>
+
 
 // default values
 static const uint32_t default_max_files = 128;
@@ -135,7 +135,7 @@ int do_create_cmd(int argc, char **argv)
     uint16_t small_x_res = default_small_res;
     uint16_t small_y_res = default_small_res;
 
-    // =========================================================================================================
+    //==================================================================================================================
 
     for (int i = 1; i < argc; ++i) {
         char *curr = argv[i]; // Current (optional) argument
@@ -173,7 +173,7 @@ int do_create_cmd(int argc, char **argv)
     }
 
 
-    // =====================================================================================================================
+    //==================================================================================================================
 
     // Initializing imgfs_file structure with the given parameters to call do_create
     struct imgfs_file imgfsFile = {
@@ -271,7 +271,6 @@ int do_read_cmd(int argc, char **argv)
     }
 
     // Extracting to a separate image file.
-    printf("here !\n");
     char* tmp_name = NULL;
     create_name(img_id, resolution, &tmp_name);
     if (tmp_name == NULL) return ERR_OUT_OF_MEMORY;
@@ -333,42 +332,37 @@ static void create_name(const char* img_id, int resolution, char** new_name) {
             resolution_str = "_unknownResolution";
     }
 
-    //format : image_id + resolution_suffix + '.jpg' + '\0' (see handout)
-    //CHANGE_SARA : using calloc instead and breaking id not enough memory
+    //Allocating memory for : image_id + resolution_suffix + '.jpg' + '\0'
     *new_name = calloc(strlen(img_id) + strlen(resolution_str) + strlen(".jpg") + 1, sizeof(char));
     if (*new_name == NULL) {
         return ; // out of memory
     }
 
-    //CHANGE_SARA :using sprintf to update filename
+    //Using sprintf to update filename
     sprintf(*new_name, "%s%s.jpg", img_id, resolution_str);
 }
 
 /**********************************************************************
  * Write the content of a buffer of size provided, to a file of name provided.
+ * TODO : DOCUMENTATION
  */
 static int write_disk_image(const char *filename, const char *image_buffer, uint32_t image_size) {
 
+    //Arguments validity check
     M_REQUIRE_NON_NULL(filename);
     M_REQUIRE_NON_NULL(image_buffer);
 
-    printf("before open file \n");
     FILE *file = fopen(filename, "wb");
-    printf("after open file \n");
+    if (file == NULL) return ERR_IO; // Checking if file opening failed
 
-    printf("Debugging: filename is: %s\n", filename);
+    size_t written_bytes = fwrite(image_buffer, sizeof(char), image_size, file);
 
-    printf("before file not found \n");
-    size_t written_bytes = fwrite(image_buffer, 1, image_size, file);
-    printf("after file not found \n");
+    fclose(file);
+
     if (written_bytes != image_size) {
         fclose(file);
         return ERR_IO;
     }
-
-    fclose(file);
-
-
 
     return ERR_NONE;
 }
@@ -377,9 +371,11 @@ static int write_disk_image(const char *filename, const char *image_buffer, uint
 
 /**********************************************************************
  * Read content of file to buffer.
+ * TODO : DOCUMENTATION
  */
 static int read_disk_image(const char *path, char **image_buffer, uint32_t *image_size) {
 
+    //Argument validity check
     M_REQUIRE_NON_NULL(path);
     M_REQUIRE_NON_NULL(image_buffer);
     M_REQUIRE_NON_NULL(image_size);
@@ -389,12 +385,14 @@ static int read_disk_image(const char *path, char **image_buffer, uint32_t *imag
         return ERR_IO;
     }
 
-    // seek end of file to get its size
+    //Seeking end of file to get its size
     fseek(file, 0, SEEK_END);
     *image_size = ftell(file);
-    fseek(file, 0, SEEK_SET); //go back to start of file
+    //Going back to start of file
+    fseek(file, 0, SEEK_SET);
 
-    *image_buffer = (char *)malloc(*image_size); // allocate memory for image
+    //Allocating memory for image
+    *image_buffer = (char *)malloc(*image_size);
     if (!(*image_buffer)) {
         fclose(file);
         return ERR_OUT_OF_MEMORY;
