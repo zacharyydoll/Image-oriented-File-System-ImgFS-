@@ -17,9 +17,11 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
         return ERR_INVALID_IMGID;
     }
     //Image already in the wanted resolution, no need to resize
+
     if (imgfs_file->metadata[index].offset[resolution] != 0) {
         return ERR_NONE;
     }
+
 
     // Determining target width and height based on resolution
     uint32_t target_height;
@@ -45,7 +47,7 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
 
     // Creating buffer
     unsigned char *img_data = calloc(img_size, sizeof(unsigned char));
-    if (!img_data) {
+    if (img_data == NULL) {
         // Handle memory allocation failure
         return ERR_OUT_OF_MEMORY;
     }
@@ -106,9 +108,10 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
     // Updating metadata for the new image
     long end_offset = ftell(imgfs_file->file);
 
-
     imgfs_file->metadata[index].offset[resolution] = (uint64_t) ((uint64_t) end_offset - buffer_size);
+    printf("in lazily resize the size before is : %lu \n",imgfs_file->metadata[index].size[resolution]);
     imgfs_file->metadata[index].size[resolution] = (uint32_t) buffer_size;
+    printf("in lazily resize the size after is : %lu \n",imgfs_file->metadata[index].size[resolution]);
     imgfs_file->metadata[index].is_valid = 1; // Mark the image as valid
 
     // Writing metadata changes to disk
@@ -122,13 +125,15 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
         return ERR_IO;
     }
 
-    fflush(imgfs_file->file);
 
     // Cleanup
     g_object_unref(orig_image);
     g_object_unref(resized_image);
     free(img_data);
     g_free(buffer);
+    fflush(imgfs_file->file);
+
+
 
 
     // Everything went well

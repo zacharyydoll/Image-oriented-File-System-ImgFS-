@@ -352,9 +352,9 @@ static int write_disk_image(const char *filename, const char *image_buffer, uint
     M_REQUIRE_NON_NULL(filename);
     M_REQUIRE_NON_NULL(image_buffer);
 
-    printf("before open file ");
+    printf("before open file \n");
     FILE *file = fopen(filename, "wb");
-    printf("after open file ");
+    printf("after open file \n");
 
     printf("Debugging: filename is: %s\n", filename);
 
