@@ -33,32 +33,67 @@ MK_OUR_ERR(ERR_IO);
  * Handle connection
  */
 static void *handle_connection(void *arg) {
-
     if (arg == NULL) return &our_ERR_INVALID_ARGUMENT;
     int client_fd = *(int*)arg;
 
-    char buffer[MAX_HEADER_SIZE];
+    //buffer for the http header - used allocation so that I can assign new value to it
+    char *rcvbuf= malloc(MAX_HEADER_SIZE);
     int read_bytes = 0;
     char *header_end = NULL;
 
     do {
         ssize_t num_bytes_read = tcp_read(client_fd,
-                                          buffer + read_bytes,
-                                          sizeof(buffer) - read_bytes - 1);
+                                          rcvbuf + read_bytes,
+                                          sizeof(rcvbuf) - read_bytes - 1);
         if (num_bytes_read < 0) {
             return &our_ERR_IO;  //error reading
         }
         read_bytes += (int)num_bytes_read; // redundant, but was to avoid implicit typecasting
-        buffer[read_bytes] = '\0';  // null terminate string for safety
+        rcvbuf[read_bytes] = '\0';  // null terminate string for safety
 
         // Search for the header delimiter
-        header_end = strstr(buffer, HTTP_HDR_END_DELIM);  // "\r\n\r\n"
+        header_end = strstr(rcvbuf, HTTP_HDR_END_DELIM);  // "\r\n\r\n"
+        //=============================================WEEK 12==========================================================
+
+        struct http_message message;
+        int content_len;
+        int ret_parsed_mess = 5;
+        if(ret_parsed_mess<0){
+            http_reply(client_fd, HTTP_BAD_REQUEST, "", NULL, 0);
+            return &our_ERR_IO; //not sure about the error type
+        }else if (ret_parsed_mess == 0){
+            if (content_len > 0 && read_bytes < content_len + (header_end - rcvbuf) + strlen(HTTP_HDR_END_DELIM)){
+                char *new_buf = realloc(rcvbuf, MAX_HEADER_SIZE + content_len);
+                if (!new_buf) {
+                    perror("Memory not allocated.\n");
+                    free(rcvbuf);
+                    exit(EXIT_FAILURE);
+                }
+
+                rcvbuf = new_buf;
+                tcp_read(client_fd,rcvbuf + read_bytes,MAX_HEADER_SIZE - read_bytes);
+                continue;
+
+            }
+
+        }else{
+            int callback_result = cb(&message, client_fd);
+            if (callback_result < 0) {
+                return &our_ERR_IO;
+
+            } else {
+                // Default behavior if no callback is set
+                http_reply(client_fd, HTTP_OK, "", NULL, 0);
+                read_bytes = 0;
+                content_len = 0;
+                memset(rcvbuf, 0, MAX_HEADER_SIZE);
+            }
+        }
     } while (!header_end && read_bytes < MAX_HEADER_SIZE);  // do this until delimiter is found, or buffer is full
 
-    if (!header_end) return &our_ERR_IO; //case where header delimiter is not found
+    if (!header_end) return &our_ERR_IO; //case where header delimiter is not found (why not 0 ? )
 
-    const char *status = strstr(buffer, "test: ok") ? HTTP_OK : HTTP_BAD_REQUEST;
-    http_reply(client_fd, status, "", NULL, 0);  // other parameters can be empty (see handout)
+    //=================================================================================================================
 
     return &our_ERR_NONE;
 }

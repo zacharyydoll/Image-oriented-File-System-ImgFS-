@@ -155,11 +155,23 @@ int http_parse_message(const char *stream, size_t bytes_received, struct http_me
         return 0;  // headers incomplete
     }
 
+    //CHANGE_SARA : added parsing the first line  (see handout )
+    const char *current = stream;
+    current = get_next_token(current, " ", &out->method);
+    current = get_next_token(current, " ", &out->uri);
+    struct http_string http_version;
+    current = get_next_token(current, HTTP_LINE_DELIM, &http_version);
+
+
     // parse headers
-    const char *body_start = http_parse_headers(stream, out);
+    //const char *body_start = http_parse_headers(stream, out);
+    // Parse headers
+    current = http_parse_headers(current, out);
+
     if (out->num_headers == 0) {
         return 0;  // no headers parsed
     }
+
 
     // extract content length from headers
     *content_len = 0;
@@ -170,16 +182,27 @@ int http_parse_message(const char *stream, size_t bytes_received, struct http_me
         }
     }
 
+    //CHANGE_SARA : condition update
+    size_t header_length = header_end + strlen(HTTP_HDR_END_DELIM) - stream;
+    size_t total_length = header_length + *content_len;
+    if (*content_len > 0 && bytes_received < total_length) {
+        return 0; // Message is incomplete (body not fully received)
+    }
+
     // handle body (if any)
     if (*content_len > 0) {
-        if (body_start + *content_len <= stream + bytes_received) {
-            out->body.val = body_start;
+        if (bytes_received < total_length){
+            out->body.val = NULL;
+            out->body.len = 0;  //incomplete body
+            return 0;
+        }else{
+            out->body.val = header_end + strlen(HTTP_HDR_END_DELIM);
             out->body.len = *content_len;
-            return 1;
-        } else {
-            return 0;  //incomplete body
         }
+
+
     }
+
 
     return 1;  // msg fully received and parsed w/o a body
 }

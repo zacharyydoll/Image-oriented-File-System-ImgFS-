@@ -109,9 +109,7 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
     long end_offset = ftell(imgfs_file->file);
 
     imgfs_file->metadata[index].offset[resolution] = (uint64_t) ((uint64_t) end_offset - buffer_size);
-    printf("in lazily resize the size before is : %lu \n",imgfs_file->metadata[index].size[resolution]);
     imgfs_file->metadata[index].size[resolution] = (uint32_t) buffer_size;
-    printf("in lazily resize the size after is : %lu \n",imgfs_file->metadata[index].size[resolution]);
     imgfs_file->metadata[index].is_valid = 1; // Mark the image as valid
 
     // Writing metadata changes to disk

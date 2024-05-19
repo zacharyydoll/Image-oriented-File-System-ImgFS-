@@ -22,6 +22,55 @@ static uint16_t server_port;
 
 #define URI_ROOT "/imgfs"
 
+/**********************************************************************
+ * Sends error message.
+ ********************************************************************** */
+static int reply_error_msg(int connection, int error)
+{
+#define ERR_MSG_SIZE 256
+    char err_msg[ERR_MSG_SIZE]; // enough for any reasonable err_msg
+    if (snprintf(err_msg, ERR_MSG_SIZE, "Error: %s\n", ERR_MSG(error)) < 0) {
+        fprintf(stderr, "reply_error_msg(): sprintf() failed...\n");
+        return ERR_RUNTIME;
+    }
+    return http_reply(connection, "500 Internal Server Error", "",
+                      err_msg, strlen(err_msg));
+}
+
+/**********************************************************************
+ * Sends 302 OK message.
+ ********************************************************************** */
+static int reply_302_msg(int connection)
+{
+    char location[ERR_MSG_SIZE];
+    if (snprintf(location, ERR_MSG_SIZE, "Location: http://localhost:%d/" BASE_FILE HTTP_LINE_DELIM,
+                 server_port) < 0) {
+        fprintf(stderr, "reply_302_msg(): sprintf() failed...\n");
+        return ERR_RUNTIME;
+    }
+    return http_reply(connection, "302 Found", location, "", 0);
+}
+
+/**********************************************************************
+ * Simple handling of http message. TO BE UPDATED WEEK 13
+ ********************************************************************** */
+int handle_http_message(struct http_message* msg, int connection)
+{
+    M_REQUIRE_NON_NULL(msg);
+    debug_printf("handle_http_message() on connection %d. URI: %.*s\n",
+                 connection,
+                 (int) msg->uri.len, msg->uri.val);
+    if (http_match_uri(msg, URI_ROOT "/list")      ||
+        (http_match_uri(msg, URI_ROOT "/insert")
+         && http_match_verb(&msg->method, "POST")) ||
+        http_match_uri(msg, URI_ROOT "/read")      ||
+        http_match_uri(msg, URI_ROOT "/delete"))
+        return reply_302_msg(connection);
+    else
+        return reply_error_msg(connection, ERR_INVALID_COMMAND);
+}
+
+
 /********************************************************************//**
  * Startup function. Create imgFS file and load in-memory structure.
  * Pass the imgFS file name as argv[1] and optionnaly port number as argv[2]
@@ -44,7 +93,7 @@ int server_startup (int argc, char **argv) {
         server_port = DEFAULT_LISTENING_PORT;
     }
 
-    http_init(server_port, NULL);
+    http_init(server_port, handle_http_message);
     printf("ImgFS server started on http://localhost:%u\n", server_port);
     return ERR_NONE;
 }
@@ -58,4 +107,6 @@ void server_shutdown (void)
     http_close();
     do_close(&fs_file);
 }
+
+
 
