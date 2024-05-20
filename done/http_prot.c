@@ -138,7 +138,7 @@ const char *http_parse_headers(const char *header_start, struct http_message *ou
     output->num_headers = idx;
 
     // return position right after end of the last header line.
-    return current + strlen(HTTP_LINE_DELIM);
+    return current; //+ strlen(HTTP_LINE_DELIM);
 }
 
 /**

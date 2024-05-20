@@ -33,6 +33,10 @@ CFLAGS += -Wcast-align
 
 CFLAGS += $(shell pkg-config vips --cflags)
 
+CFLAGS += -I/usr/include/json-c
+LDLIBS += -ljson-c
+
+
 ## may require: export ASAN_OPTIONS=allocator_may_return_null=1
 #               export ASAN_OPTIONS=verify_asan_link_order=0
 # different -fsanitize options are available, including -fmemory

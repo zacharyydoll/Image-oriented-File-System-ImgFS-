@@ -51,9 +51,72 @@ static int reply_302_msg(int connection)
     return http_reply(connection, "302 Found", location, "", 0);
 }
 
+
+// WEEK 13 =============================================================================================================
+
+int handle_list_call(int connection) {
+
+    char *json_op = NULL;
+    int list_ret = do_list(&fs_file, JSON, &json_op);
+
+    if (list_ret != ERR_NONE) {
+        if (json_op) free(json_op);
+        return reply_error_msg(connection, list_ret);
+    }
+
+    if (json_op) {
+        int ret = http_reply(connection, "200 OK", "Content-Type: application/json\r\n",
+                             json_op, strlen(json_op));
+        free(json_op);
+        return ret;
+    }
+
+    return ERR_NONE;
+}
+
+
+int handle_read_call(int connection) {
+    return reply_302_msg(connection);
+}
+
+int handle_delete_call(int connection) {
+    return reply_302_msg(connection);
+}
+
+int handle_insert_call(int connection) {
+    return reply_302_msg(connection);
+}
+
+// WEEK 13 =============================================================================================================
+
+
 /**********************************************************************
  * Simple handling of http message. TO BE UPDATED WEEK 13
  ********************************************************************** */
+/*int handle_http_message(struct http_message* msg, int connection) {
+    M_REQUIRE_NON_NULL(msg);
+    debug_printf("handle_http_message() on connection %d. URI: %.*s\n",
+                 connection,
+                 (int) msg->uri.len, msg->uri.val);
+
+    if (http_match_verb(&msg->method, "GET") &&
+        (http_match_uri(msg, "/") || http_match_uri(msg, "/index.html"))) {
+        return http_serve_file(connection, BASE_FILE);
+    }
+    if (http_match_uri(msg, URI_ROOT "/list")) {
+        return handle_list_call(connection);
+    }
+    if (http_match_uri(msg, URI_ROOT "/read")) {
+        return handle_read_call(connection);
+    }
+    if (http_match_uri(msg, URI_ROOT "/delete")) {
+        return handle_delete_call(connection);
+    }
+    if (http_match_uri(msg, URI_ROOT "/insert") && http_match_verb(&msg->method, "POST")) {
+        return handle_insert_call(connection);
+    }
+    return reply_error_msg(connection, ERR_INVALID_COMMAND);
+}*/
 int handle_http_message(struct http_message* msg, int connection)
 {
     M_REQUIRE_NON_NULL(msg);

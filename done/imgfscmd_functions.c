@@ -81,13 +81,20 @@ int do_list_cmd(int argc, char **argv)
     if (open_ret != ERR_NONE) return open_ret;
 
     //Displaying the content of the imgFS file
-    int list_ret = do_list(&imgfsFile, STDOUT, NULL);
+    // WEEK 13 Modifications
+    char *json_op = NULL;
+    int list_ret = do_list(&imgfsFile, JSON, &json_op);
+    //int list_ret = do_list(&imgfsFile, STDOUT, NULL);
 
     if (list_ret != ERR_NONE) {
         do_close(&imgfsFile); // closing the file before returning
         return list_ret;
     }
 
+    if (json_op){
+        printf("%s\n", json_op);
+        free(json_op);
+    }
     //Closing the imgFS file
     do_close(&imgfsFile);
 
