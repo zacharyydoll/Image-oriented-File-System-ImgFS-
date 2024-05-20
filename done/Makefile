@@ -73,7 +73,7 @@ tcp: tcp-test-client tcp-test-server
 tcp-test-client: util.o tcp-test-client.o socket_layer.o
 tcp-test-server: util.o tcp-test-server.o socket_layer.o
 
-http-test-server: http-test-server.o http_net.o socket_layer.o error.o util.o
+http-test-server: http-test-server.o http_net.o socket_layer.o error.o util.o http_prot.o
 
 # Computes the valid targets for `all`
 TARGETS = imgfscmd

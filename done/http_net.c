@@ -220,7 +220,6 @@ int http_reply(int connection, const char* status, const char* headers, const ch
         memcpy(buffer + header_len, body, body_len);
     }
 
-    // Send everything to the socket
     ssize_t total_len = header_len + body_len;
     ssize_t sent_len = tcp_send(connection, buffer, total_len);
 
