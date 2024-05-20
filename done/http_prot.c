@@ -163,8 +163,7 @@ int http_parse_message(const char *stream, size_t bytes_received, struct http_me
     current = get_next_token(current, HTTP_LINE_DELIM, &http_version);
 
 
-    // parse headers
-    //const char *body_start = http_parse_headers(stream, out);
+
     // Parse headers
     current = http_parse_headers(current, out);
 

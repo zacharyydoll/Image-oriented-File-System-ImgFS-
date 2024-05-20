@@ -54,10 +54,12 @@ static void *handle_connection(void *arg) {
         // Search for the header delimiter
         header_end = strstr(rcvbuf, HTTP_HDR_END_DELIM);  // "\r\n\r\n"
         //=============================================WEEK 12==========================================================
-
+        //maybe outside loop with a recursive call for ==0
         struct http_message message;
         int content_len;
-        int ret_parsed_mess = 5;
+        printf("\n we are here \n");
+        int ret_parsed_mess = http_parse_message(rcvbuf, read_bytes, &message, &content_len);
+        printf("\n ret of parsing message is : %i \n",ret_parsed_mess);
         if(ret_parsed_mess<0){
             http_reply(client_fd, HTTP_BAD_REQUEST, "", NULL, 0);
             return &our_ERR_IO; //not sure about the error type
@@ -75,12 +77,10 @@ static void *handle_connection(void *arg) {
                 continue;
 
             }
-
         }else{
             int callback_result = cb(&message, client_fd);
             if (callback_result < 0) {
                 return &our_ERR_IO;
-
             } else {
                 // Default behavior if no callback is set
                 http_reply(client_fd, HTTP_OK, "", NULL, 0);
