@@ -9,5 +9,4 @@ tcp-test-server
 http-test-server
 
 *.xml
-*.html
 *.jpg

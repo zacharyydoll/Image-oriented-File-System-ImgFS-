@@ -49,6 +49,7 @@ add_executable(cs202_24_prj_sophie_zac
         done/PersonalTests/test_http_prot.c
         done/tests/unit/unit-test-imgfsread.c
         done/tests/unit/personal_tests_week12.c
+        done/imgfs_list.c
 )
 
 # Specify directories to include during the build process

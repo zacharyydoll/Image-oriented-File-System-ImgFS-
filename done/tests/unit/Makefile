@@ -18,6 +18,9 @@ LDLIBS   += -fsanitize=address
 CFLAGS	 += $(shell pkg-config --cflags vips)
 LDLIBS	 += $(shell pkg-config --libs vips)
 
+CFLAGS	 += $(shell pkg-config --cflags json-c)
+LDLIBS	 += $(shell pkg-config --libs json-c)
+
 EXECS=$(foreach name,$(TARGETS),unit-test-$(name))
 
 .PHONY: unit-tests all $(TARGETS) execs
@@ -87,12 +90,6 @@ http: unit-test-http
 	@printf '\n'
 
 # ======================================================================
-personal: personal_tests_week12
-	./$^ && echo "==== " $< " SUCCEEDED =====" || { echo "==== " $< " FAILED ====="; false; }
-	@printf '\n'
-
-# ======================================================================
-
 DATA_DIR ?= ../data/
 SRC_DIR  ?= ../../done
 CFLAGS  += '-I$(SRC_DIR)' -DCS202_TEST -DDATA_DIR='"$(DATA_DIR)"'
@@ -153,10 +150,6 @@ unit-test-imgfsread: unit-test-imgfsread.o $(OBJS)
 # ======================================================================
 unit-test-http.o: unit-test-http.c $(SRC_DIR)/imgfs.h
 unit-test-http: unit-test-http.o $(OBJS)
-
-# ======================================================================
-personal_tests_week12.o: personal_tests_week12.c $(SRC_DIR)/imgfs.h
-personal_tests_week12: personal_tests_week12.o $(OBJS)
 
 # ======================================================================
 
