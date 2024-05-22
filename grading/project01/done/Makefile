@@ -11,7 +11,7 @@
 
 # Note: builds with address sanitizer by default
 
-TEST_DIR = $(PWD)/../done/tests
+TEST_DIR = $(PWD)/../provided/tests
 
 ## You can change the tag to run week07, week08, etc.
 IMAGE := chappeli/cs202-feedback:latest
@@ -31,12 +31,6 @@ CFLAGS += -Wextra -Wfloat-equal -Wshadow -Wpointer-arith -Wbad-function-cast -Ww
 
 CFLAGS += -Wcast-align
 
-CFLAGS += $(shell pkg-config vips --cflags)
-
-CFLAGS += -I/usr/include/json-c
-LDLIBS += -ljson-c
-
-
 ## may require: export ASAN_OPTIONS=allocator_may_return_null=1
 #               export ASAN_OPTIONS=verify_asan_link_order=0
 # different -fsanitize options are available, including -fmemory
@@ -44,7 +38,6 @@ CPPFLAGS += -fsanitize=address
 LDFLAGS  += -fsanitize=address
 LDLIBS   += -fsanitize=address
 
-LDLIBS += $(shell pkg-config vips --libs)
 CFLAGS   += -DWEEK=12
 
 ifdef DEBUG
@@ -62,6 +55,12 @@ LDLIBS += -lm -lssl -lcrypto
 
 OBJS=$(subst .c,.o,$(SRCS))
 
+# Add options for the compiler to include the library's headers
+CFLAGS += $(shell pkg-config vips --cflags)
+
+# Add the library to the linker
+LDLIBS += $(shell pkg-config vips --libs)
+
 all:: all-deferred
 
 
@@ -73,7 +72,7 @@ tcp: tcp-test-client tcp-test-server
 tcp-test-client: util.o tcp-test-client.o socket_layer.o
 tcp-test-server: util.o tcp-test-server.o socket_layer.o
 
-http-test-server: http-test-server.o http_net.o socket_layer.o error.o util.o http_prot.o
+http-test-server: http-test-server.o http_net.o http_prot.o socket_layer.o error.o util.o
 
 # Computes the valid targets for `all`
 TARGETS = imgfscmd
@@ -89,6 +88,8 @@ endif
 ifneq (,$(wildcard ./http-test-server.c))
 TARGETS += http-test-server
 endif
+
+
 
 all-deferred:: $(TARGETS)
 
@@ -130,6 +131,8 @@ $(TEST_DIR)/unit/%:
 
 
 
+
+
 dbg: $(TEST_DIR)/unit/$(EXE)
 ifndef TEST
 	$(error Missing test name)
@@ -138,11 +141,11 @@ ifndef EXE
 	$(error Missing executable name)
 endif
 	gdb -ex 'set debuginfod enabled off' \
-	    -ex 'cd $(TEST_DIR)/unit/' \
+	    -ex 'cd ../provided/tests/unit/' \
 	    -ex 'set environment CK_FORK=no' \
 	    -ex 'break $(TEST)' -ex 'run'    \
 	    -ex 'n' -ex 'layout src'         \
-	    '$(TEST_DIR)/unit/unit-test-$(EXE)'
+	    '$(PWD)/../provided/tests/unit/unit-test-$(EXE)'
 
 define e2e_test
 robot -v srcdir:$(PWD) -v datadir:$(TEST_DIR)/data $(TEST_DIR)/end-to-end/$1 ;
@@ -150,7 +153,6 @@ endef
 end2end-tests: $(TARGETS)
 	$(call e2e_test,week07.robot)
 	$(call e2e_test,week08.robot)
-	$(call e2e_test,week10.robot)
 
 check: end2end-tests unit-tests
 

@@ -1,0 +1,35 @@
+/home/ryang/cs202/cs202-24-fuzz-corpus/working/dedup-crashes/crash-ad59d98467f7fdff73ea8681aa75355ae38bd5b1
+==2274813==WARNING: AddressSanitizer failed to allocate 0xcdca2b0 bytes
+=================================================================
+==2274813==ERROR: AddressSanitizer: attempting double-free on 0x615000011380 in thread T0:
+    #0 0x55e1016fe822 in __interceptor_free (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0xee822) (BuildId: b2098be52ff3c9b87b2886ae486c859cbaf2704a)
+    #1 0x7f002725dd26 in _IO_deallocate_file libio/./libio/libioP.h:862:3
+    #2 0x7f002725dd26 in fclose libio/./libio/iofclose.c:74:3
+    #3 0x55e1016d080f in fclose (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0xc080f) (BuildId: b2098be52ff3c9b87b2886ae486c859cbaf2704a)
+    #4 0x55e10174cb5a in do_create_cmd /home/ryang/cs202/cs202-24-fuzz-corpus/projects/cs202-24-prj-sophie-zac/./done/imgfscmd_functions.c:180:5
+    #5 0x55e10174a42e in fuzz_main /home/ryang/cs202/cs202-24-fuzz-corpus/projects/cs202-24-prj-sophie-zac/./done/imgfscmd.c:72:19
+    #6 0x55e101741b5a in LLVMFuzzerTestOneInput /home/ryang/cs202/cs202-24-fuzz-corpus/src/fuzz-target.c:106:13
+    #7 0x55e101662453 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0x52453) (BuildId: b2098be52ff3c9b87b2886ae486c859cbaf2704a)
+    #8 0x55e10164c1cf in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0x3c1cf) (BuildId: b2098be52ff3c9b87b2886ae486c859cbaf2704a)
+    #9 0x55e101651f26 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0x41f26) (BuildId: b2098be52ff3c9b87b2886ae486c859cbaf2704a)
+    #10 0x55e10167bd42 in main (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0x6bd42) (BuildId: b2098be52ff3c9b87b2886ae486c859cbaf2704a)
+    #11 0x7f0027208d8f in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16
+    #12 0x7f0027208e3f in __libc_start_main csu/../csu/libc-start.c:392:3
+    #13 0x55e101646a94 in _start (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0x36a94) (BuildId: b2098be52ff3c9b87b2886ae486c859cbaf2704a)
+
+DEDUP_TOKEN: __interceptor_free--_IO_deallocate_file--fclose--fclose--do_create_cmd--fuzz_main--LLVMFuzzerTestOneInput--fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long)--fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long)--fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long))--main--__libc_start_call_main--__libc_start_main--_start
+0x615000011380 is located 0 bytes inside of 472-byte region [0x615000011380,0x615000011558)
+freed by thread T0 here:
+    #0 0x55e1016fe822 in __interceptor_free (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0xee822) (BuildId: b2098be52ff3c9b87b2886ae486c859cbaf2704a)
+    #1 0x7f002725dd26 in _IO_deallocate_file libio/./libio/libioP.h:862:3
+    #2 0x7f002725dd26 in fclose libio/./libio/iofclose.c:74:3
+
+DEDUP_TOKEN: __interceptor_free--_IO_deallocate_file--fclose
+previously allocated by thread T0 here:
+    #0 0x55e1016feace in malloc (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0xeeace) (BuildId: b2098be52ff3c9b87b2886ae486c859cbaf2704a)
+    #1 0x7f002725e64d in __fopen_internal libio/./libio/iofopen.c:65:37
+    #2 0x7f002725e64d in fopen64 libio/./libio/iofopen.c:86:10
+
+DEDUP_TOKEN: malloc--__fopen_internal--fopen64
+SUMMARY: AddressSanitizer: double-free (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0xee822) (BuildId: b2098be52ff3c9b87b2886ae486c859cbaf2704a) in __interceptor_free
+==2274813==ABORTING
