@@ -33,13 +33,15 @@ MK_OUR_ERR(ERR_IO);
  * Handle connection
  */
 static void *handle_connection(void *arg) {
-
     if (arg == NULL) return &our_ERR_INVALID_ARGUMENT;
-    int client_fd = *(int*)arg;
+    int client_fd = *(int *)arg;
 
     //buffer for the http header - used allocation so that I can assign new value to it
     char *rcvbuf = malloc(MAX_HEADER_SIZE);
-    if (rcvbuf == NULL) return &our_ERR_OUT_OF_MEMORY;
+    if (rcvbuf == NULL) {
+        close(client_fd);
+        return &our_ERR_OUT_OF_MEMORY;
+    }
 
     int read_bytes = 0;
     char *header_end = NULL;
@@ -49,11 +51,11 @@ static void *handle_connection(void *arg) {
     struct http_message message;
 
     do {
-        ssize_t num_bytes_read = tcp_read(client_fd,
-                                          rcvbuf + read_bytes,
+        ssize_t num_bytes_read = tcp_read(client_fd, rcvbuf + read_bytes,
                                           MAX_HEADER_SIZE - read_bytes - 1);
-        if (num_bytes_read < 0) {
+        if (num_bytes_read <= 0) {
             free(rcvbuf);
+            close(client_fd);
             return &our_ERR_IO;
         }
         read_bytes += (int)num_bytes_read;
@@ -64,39 +66,39 @@ static void *handle_connection(void *arg) {
 
         //=============================================WEEK 12==========================================================
 
-        int ret_parsed_mess = http_parse_message(rcvbuf,read_bytes,&message, &content_len);
+        int ret_parsed_mess = http_parse_message(rcvbuf, read_bytes, &message, &content_len);
         if (ret_parsed_mess < 0) {
             free(rcvbuf); // parse_message returns negative if an error occurred (http_prot.h)
+            close(client_fd);
             return &our_ERR_IO;
         } else if (ret_parsed_mess == 0) { //partial treatment (see http_prot.h)
             if (!extended && content_len > 0 && read_bytes < MAX_HEADER_SIZE + content_len) {
                 char *new_buf = realloc(rcvbuf, MAX_HEADER_SIZE + content_len);
                 if (!new_buf) {
                     free(rcvbuf);
+                    close(client_fd);
                     return &our_ERR_OUT_OF_MEMORY;
                 }
                 rcvbuf = new_buf;
                 extended = 1;
             }
         } else { // case where the message was fully received and parsed
-            int callback_result = cb(&message, client_fd);
-            if (callback_result < 0) {
+            if (cb(&message, client_fd) < 0) {
                 free(rcvbuf);
+                close(client_fd);
                 return &our_ERR_IO;
-            } else {
-                read_bytes = 0;
-                content_len = 0;
-                extended = 0;
-                memset(rcvbuf, 0, MAX_HEADER_SIZE);
             }
+            read_bytes = 0;
+            content_len = 0;
+            extended = 0;
+            memset(rcvbuf, 0, MAX_HEADER_SIZE);
         }
-    } while (!header_end && read_bytes < MAX_HEADER_SIZE);  // do this until delimiter is found, or buffer is full
+    } while (!header_end && read_bytes < MAX_HEADER_SIZE); // do this until delimiter is found, or buffer is full
 
-    free(rcvbuf); // avoid memory leaks :)
+    free(rcvbuf);
+    close(client_fd);
     return &our_ERR_NONE;
 }
-
-
 
 
 /*******************************************************************

@@ -68,6 +68,7 @@ int handle_list_call(int connection) {
         printf("Sending JSON response: %s\n", json_op);//debug print
         int ret = http_reply(connection, "200 OK", "Content-Type: application/json\r\n",
                              json_op, strlen(json_op));
+
         free(json_op);
         return ret;
     }
