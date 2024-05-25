@@ -76,7 +76,6 @@ int do_list(const struct imgfs_file *imgfs_file,
             json_object_put(json_obj); //failed to cpy
             return ERR_RUNTIME;
         }
-
         json_object_put(json_obj); // free
 
         return ERR_NONE;
