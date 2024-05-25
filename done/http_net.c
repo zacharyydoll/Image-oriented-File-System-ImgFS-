@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <signal.h>
+#include <pthread.h>
 
 #include "http_prot.h"
 #include "http_net.h"
@@ -34,14 +35,18 @@ MK_OUR_ERR(ERR_IO);
  */
 static void *handle_connection(void *arg) {
     if (arg == NULL) return &our_ERR_INVALID_ARGUMENT;
-    int client_fd = *(int *)arg;
+
+    sigset_t mask;
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGINT );
+    sigaddset(&mask, SIGTERM);
+    pthread_sigmask(SIG_BLOCK, &mask, NULL);
+
+    int client_fd = *(int*)arg;
 
     //buffer for the http header - used allocation so that I can assign new value to it
     char *rcvbuf = malloc(MAX_HEADER_SIZE);
-    if (rcvbuf == NULL) {
-        close(client_fd);
-        return &our_ERR_OUT_OF_MEMORY;
-    }
+    if (rcvbuf == NULL) return &our_ERR_OUT_OF_MEMORY;
 
     int read_bytes = 0;
     char *header_end = NULL;
@@ -51,11 +56,11 @@ static void *handle_connection(void *arg) {
     struct http_message message;
 
     do {
-        ssize_t num_bytes_read = tcp_read(client_fd, rcvbuf + read_bytes,
+        ssize_t num_bytes_read = tcp_read(client_fd,
+                                          rcvbuf + read_bytes,
                                           MAX_HEADER_SIZE - read_bytes - 1);
-        if (num_bytes_read <= 0) {
+        if (num_bytes_read < 0) {
             free(rcvbuf);
-            close(client_fd);
             return &our_ERR_IO;
         }
         read_bytes += (int)num_bytes_read;
@@ -66,39 +71,41 @@ static void *handle_connection(void *arg) {
 
         //=============================================WEEK 12==========================================================
 
-        int ret_parsed_mess = http_parse_message(rcvbuf, read_bytes, &message, &content_len);
+        int ret_parsed_mess = http_parse_message(rcvbuf,read_bytes,&message, &content_len);
         if (ret_parsed_mess < 0) {
             free(rcvbuf); // parse_message returns negative if an error occurred (http_prot.h)
-            close(client_fd);
             return &our_ERR_IO;
         } else if (ret_parsed_mess == 0) { //partial treatment (see http_prot.h)
             if (!extended && content_len > 0 && read_bytes < MAX_HEADER_SIZE + content_len) {
                 char *new_buf = realloc(rcvbuf, MAX_HEADER_SIZE + content_len);
                 if (!new_buf) {
                     free(rcvbuf);
-                    close(client_fd);
                     return &our_ERR_OUT_OF_MEMORY;
                 }
                 rcvbuf = new_buf;
                 extended = 1;
             }
         } else { // case where the message was fully received and parsed
-            if (cb(&message, client_fd) < 0) {
+            int callback_result = cb(&message, client_fd);
+            if (callback_result < 0) {
                 free(rcvbuf);
-                close(client_fd);
                 return &our_ERR_IO;
+            } else {
+                read_bytes = 0;
+                content_len = 0;
+                extended = 0;
+                memset(rcvbuf, 0, MAX_HEADER_SIZE);
             }
-            read_bytes = 0;
-            content_len = 0;
-            extended = 0;
-            memset(rcvbuf, 0, MAX_HEADER_SIZE);
         }
-    } while (!header_end && read_bytes < MAX_HEADER_SIZE); // do this until delimiter is found, or buffer is full
+    } while (!header_end && read_bytes < MAX_HEADER_SIZE);  // do this until delimiter is found, or buffer is full
 
-    free(rcvbuf);
+    free(rcvbuf); // avoid memory leaks :)
     close(client_fd);
+    free(arg);
     return &our_ERR_NONE;
 }
+
+
 
 
 /*******************************************************************
@@ -128,12 +135,40 @@ void http_close(void) {
 int http_receive(void) {
     //connects to socket with tcp_accept (returns ERR_IO if fails),
     // and handles the connection through handle_connection().
-    int client_fd = tcp_accept(passive_socket);
-    if (client_fd < 0) {
+    pthread_attr_t thread ;
+    int ret;
+    int* active_socket = (int*) calloc(1,sizeof(int));
+
+    if (!active_socket) {
+        // Memory allocation failed, return error
+        return ERR_OUT_OF_MEMORY;
+    }
+    *active_socket = tcp_accept(passive_socket);
+    if (*active_socket < 0) {
+        free(active_socket);
+        return ERR_IO;
+    }
+    // Initialize the thread attributes
+    ret = pthread_attr_init(&thread);
+    if (ret) {
+        free(active_socket);
+        return ERR_IO;
+    }
+    ret = pthread_attr_setdetachstate(&thread, PTHREAD_CREATE_DETACHED);
+    if(ret){
+        pthread_attr_destroy(&thread); // Error handling, destroy the initialized attributes before return
+        free(active_socket);
+        return ERR_IO;
+    }
+    ret = pthread_create(&thread, NULL, handle_connection, (void *) active_socket);
+    if (ret) {
+        pthread_attr_destroy(&thread);
+        free(active_socket);
         return ERR_IO;
     }
 
-    handle_connection((void*)&client_fd);
+    // Once done with the connection, free the active socket
+    pthread_attr_destroy(&thread);
     return ERR_NONE;
 }
 
@@ -196,11 +231,11 @@ int http_reply(int connection, const char* status, const char* headers, const ch
     M_REQUIRE_NON_NULL(status);
     M_REQUIRE_NON_NULL(headers);
 
-    if(body == NULL && body_len > 0) {
+    if (body == NULL && body_len > 0) {
         return ERR_INVALID_ARGUMENT; // body can be null for responses with empty body, but then length should be 0
     }
 
-    // compute required buffer size
+    // Compute required buffer size
     size_t est_header_len = strlen(HTTP_PROTOCOL_ID) + 1 + strlen(status) + strlen(HTTP_LINE_DELIM) +
                             strlen(headers) + strlen("Content-Length: ") + 20 + strlen(HTTP_HDR_END_DELIM);
 
@@ -209,15 +244,15 @@ int http_reply(int connection, const char* status, const char* headers, const ch
     char *buffer = malloc(max_total_size + 1);  // +1 for null terminator
     if (!buffer) return ERR_OUT_OF_MEMORY;
 
-    // header with format from handout (see https://www.geeksforgeeks.org/snprintf-c-library/)
-    int header_len = snprintf(buffer, max_total_size + 1, "%s %s\r\n%sContent-Length: %zu\r\n\r\n",
+    // ensure status string starts with space after HTTP version
+    int header_len = snprintf(buffer, max_total_size + 1, "%s%s\r\n%sContent-Length: %zu\r\n\r\n",
                               HTTP_PROTOCOL_ID, status, headers, body_len);
     if (header_len < 0 || (size_t)header_len >= max_total_size + 1) {
         free(buffer);
         return ERR_RUNTIME;
     }
 
-    // add body to the end of the buffer
+    // Add body to the end of the buffer
     if (body && body_len > 0) {
         memcpy(buffer + header_len, body, body_len);
     }
