@@ -26,8 +26,7 @@ static uint16_t server_port;
 /**********************************************************************
  * Sends error message.
  ********************************************************************** */
-static int reply_error_msg(int connection, int error)
-{
+static int reply_error_msg(int connection, int error) {
 #define ERR_MSG_SIZE 256
     char err_msg[ERR_MSG_SIZE]; // enough for any reasonable err_msg
     if (snprintf(err_msg, ERR_MSG_SIZE, "Error: %s\n", ERR_MSG(error)) < 0) {
@@ -41,8 +40,7 @@ static int reply_error_msg(int connection, int error)
 /**********************************************************************
  * Sends 302 OK message.
  ********************************************************************** */
-static int reply_302_msg(int connection)
-{
+static int reply_302_msg(int connection) {
     char location[ERR_MSG_SIZE];
     if (snprintf(location, ERR_MSG_SIZE, "Location: http://localhost:%d/" BASE_FILE HTTP_LINE_DELIM,
                  server_port) < 0) {
@@ -65,7 +63,7 @@ int handle_list_call(int connection) {
     }
 
     if (json_op) {
-        printf("Sending JSON response: %s\n", json_op);//debug print
+        //printf("Sending JSON response: %s\n", json_op);//debug print
         int ret = http_reply(connection, "200 OK", "Content-Type: application/json\r\n",
                              json_op, strlen(json_op));
 
@@ -78,7 +76,7 @@ int handle_list_call(int connection) {
 
 
 
-int handle_read_call(int connection, const struct http_message* msg) {
+/*int handle_read_call(int connection, const struct http_message* msg) {
     char res_str[15] = {0};
     char img_id[MAX_IMG_ID] = {0};
 
@@ -105,11 +103,49 @@ int handle_read_call(int connection, const struct http_message* msg) {
     snprintf(headers, sizeof(headers),
              "Content-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n", image_size);
 
+    //printf("\nServing image %s with size %u\n", img_id, image_size);
+
+    //send HTTP response with the image
+    int http_ret = http_reply(connection, "200 OK", headers, image_buffer, image_size);
+    free(image_buffer);
+    return http_ret;
+}*/
+
+int handle_read_call(int connection, const struct http_message* msg) {
+    char res_str[15] = {0};
+    char img_id[MAX_IMG_ID] = {0};
+
+    // Get res and imgID from the image's URI
+    if (http_get_var(&msg->uri, "res", res_str, sizeof(res_str)) == 0 ||
+        http_get_var(&msg->uri, "img_id", img_id, sizeof(img_id)) == 0) {
+        return reply_error_msg(connection, ERR_INVALID_ARGUMENT);
+    }
+
+    //convert resolution string to int value
+    int res = resolution_atoi(res_str);
+    if (res == -1) {
+        return reply_error_msg(connection, ERR_INVALID_ARGUMENT);
+    }
+
+    char *image_buffer;
+    uint32_t image_size;
+    int ret_read = do_read(img_id, res, &image_buffer, &image_size, &fs_file);
+    if (ret_read != ERR_NONE) {
+        return reply_error_msg(connection, ret_read);
+    }
+
+    char headers[256];
+    snprintf(headers, sizeof(headers), "Content-Type: image/jpeg\r\n");
+
+    // Debugging output
+    //printf("Serving image %s with size %u\n", img_id, image_size);
+
     //send HTTP response with the image
     int http_ret = http_reply(connection, "200 OK", headers, image_buffer, image_size);
     free(image_buffer);
     return http_ret;
 }
+
 
 
 int handle_delete_call(int connection, const struct http_message* msg) {
@@ -161,53 +197,36 @@ int handle_http_message(struct http_message* msg, int connection) {
                  connection,
                  (int) msg->uri.len, msg->uri.val);
 
-    printf("Handling HTTP message with URI: %.*s\n", (int) msg->uri.len, msg->uri.val);  // Debug print
+    //printf("Handling HTTP message with URI: %.*s\n", (int) msg->uri.len, msg->uri.val);  // Debug print
+
+    if (http_match_verb(&msg->uri, "/") || http_match_uri(msg, "/index.html")) {
+        return http_serve_file(connection, BASE_FILE);
+    }
 
     if (http_match_verb(&msg->method, "GET")) {
         if (http_match_uri(msg, URI_ROOT "/list")) {
-            printf("Handling GET imgfs list\n");//debug print
+            //printf("Handling GET imgfs list\n");//debug print
             return handle_list_call(connection);
         }
         if (http_match_uri(msg, URI_ROOT "/read")) {
-            printf("Handling GET imgfs read\n");//debug print
+            //printf("Handling GET imgfs read\n");//debug print
             return handle_read_call(connection, msg);
         }
         if (http_match_uri(msg, URI_ROOT "/delete")) {
-            printf("Handling GET imgfs delete\n");//debug print
+            //printf("Handling GET imgfs delete\n");//debug print
             return handle_delete_call(connection, msg);
-        }
-        if (http_match_uri(msg, "/") || http_match_uri(msg, "/index.html")) {
-            printf("Handling GET or index.html\n");//debug print
-            return http_serve_file(connection, BASE_FILE);
         }
     }
 
     if (http_match_verb(&msg->method, "POST") &&
         http_match_uri(msg, URI_ROOT "/insert")) {
-        printf("Handling POST /imgfs/insert\n");//debug print
+        //printf("Handling POST /imgfs/insert\n");//debug print
         return handle_insert_call(connection, msg);
     }
 
-    printf("Invalid command: %.*s\n", (int) msg->uri.len, msg->uri.val);
+    //printf("Invalid command: %.*s\n", (int) msg->uri.len, msg->uri.val);
     return reply_error_msg(connection, ERR_INVALID_COMMAND);
 }
-
-
-/*int handle_http_message(struct http_message* msg, int connection)
-{
-    M_REQUIRE_NON_NULL(msg);
-    debug_printf("handle_http_message() on connection %d. URI: %.*s\n",
-                 connection,
-                 (int) msg->uri.len, msg->uri.val);
-    if (http_match_uri(msg, URI_ROOT "/list")      ||
-        (http_match_uri(msg, URI_ROOT "/insert")
-         && http_match_verb(&msg->method, "POST")) ||
-        http_match_uri(msg, URI_ROOT "/read")      ||
-        http_match_uri(msg, URI_ROOT "/delete"))
-        return reply_302_msg(connection);
-    else
-        return reply_error_msg(connection, ERR_INVALID_COMMAND);
-}*/
 
 
 /********************************************************************//**
@@ -223,7 +242,7 @@ int server_startup (int argc, char **argv) {
         return ERR_RUNTIME;
     }
 
-    int ret_open = do_open(argv[1], "r+", &fs_file);
+    int ret_open = do_open(argv[1], "rb+", &fs_file);
     if (ret_open < 0) {
         return ret_open;
     }
@@ -245,8 +264,7 @@ int server_startup (int argc, char **argv) {
 /********************************************************************//**
  * Shutdown function. Free the structures and close the file.
  ********************************************************************** */
-void server_shutdown (void)
-{
+void server_shutdown (void) {
     fprintf(stderr, "Shutting down...\n");
     http_close();
     do_close(&fs_file);
