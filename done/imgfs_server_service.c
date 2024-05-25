@@ -114,7 +114,7 @@ int handle_read_call(int connection, const struct http_message* msg) {
         return reply_error_msg(connection, ERR_RESOLUTIONS);
     }
 
-    char *image_buffer = NULL;;
+    char *image_buffer ;
     uint32_t image_size = 0; //
 
     // Lock the mutex before calling do_read
