@@ -13,10 +13,11 @@
 #include <unistd.h>
 #include <signal.h>
 
+#include "error.h"
+#include "imgfs.h"
 #include "http_prot.h"
 #include "http_net.h"
 #include "socket_layer.h"
-#include "error.h"
 
 static int passive_socket = -1;
 static EventCallback cb;
@@ -54,7 +55,9 @@ static void *handle_connection(void *arg) {
         ssize_t num_bytes_read = tcp_read(client_fd, rcvbuf + read_bytes,
                                           MAX_HEADER_SIZE - read_bytes - 1);
         if (num_bytes_read <= 0) {
+            //safe_free((void**) rcvbuf);
             free(rcvbuf);
+            rcvbuf = NULL;
             close(client_fd);
             return &our_ERR_IO;
         }
@@ -68,14 +71,18 @@ static void *handle_connection(void *arg) {
 
         int ret_parsed_mess = http_parse_message(rcvbuf, read_bytes, &message, &content_len);
         if (ret_parsed_mess < 0) {
-            free(rcvbuf); // parse_message returns negative if an error occurred (http_prot.h)
+            //safe_free((void**) rcvbuf); // parse_message returns negative if an error occurred (http_prot.h)
+            free(rcvbuf);
+            rcvbuf = NULL;
             close(client_fd);
             return &our_ERR_IO;
         } else if (ret_parsed_mess == 0) { //partial treatment (see http_prot.h)
             if (!extended && content_len > 0 && read_bytes < MAX_HEADER_SIZE + content_len) {
                 char *new_buf = realloc(rcvbuf, MAX_HEADER_SIZE + content_len);
                 if (!new_buf) {
+                    //safe_free((void**) rcvbuf);
                     free(rcvbuf);
+                    rcvbuf = NULL;
                     close(client_fd);
                     return &our_ERR_OUT_OF_MEMORY;
                 }
@@ -84,7 +91,9 @@ static void *handle_connection(void *arg) {
             }
         } else { // case where the message was fully received and parsed
             if (cb(&message, client_fd) < 0) {
+                //safe_free((void**) rcvbuf);
                 free(rcvbuf);
+                rcvbuf = NULL;
                 close(client_fd);
                 return &our_ERR_IO;
             }
@@ -95,7 +104,9 @@ static void *handle_connection(void *arg) {
         }
     } while (!header_end && read_bytes < MAX_HEADER_SIZE); // do this until delimiter is found, or buffer is full
 
+    //safe_free((void**) rcvbuf);
     free(rcvbuf);
+    rcvbuf = NULL;
     close(client_fd);
     return &our_ERR_NONE;
 }
@@ -232,13 +243,15 @@ int http_reply(int connection, const char* status, const char* headers, const ch
     M_REQUIRE_NON_NULL(status);
     M_REQUIRE_NON_NULL(headers);
 
+    const int EXTRA_SPACE = 20;
+
     if (body == NULL && body_len > 0) {
         return ERR_INVALID_ARGUMENT; // body can be null for responses with empty body, but then length should be 0
     }
 
     // Compute required buffer size
     size_t est_header_len = strlen(HTTP_PROTOCOL_ID) + 1 + strlen(status) + strlen(HTTP_LINE_DELIM) +
-                            strlen(headers) + strlen("Content-Length: ") + 20 + strlen(HTTP_HDR_END_DELIM);
+                            strlen(headers) + strlen("Content-Length: ") + EXTRA_SPACE + strlen(HTTP_HDR_END_DELIM);
 
     size_t max_total_size = est_header_len + body_len;
 
@@ -250,6 +263,7 @@ int http_reply(int connection, const char* status, const char* headers, const ch
                               HTTP_PROTOCOL_ID, status, headers, body_len);
     if (header_len < 0 || (size_t)header_len >= max_total_size + 1) {
         free(buffer);
+        buffer = NULL;
         return ERR_RUNTIME;
     }
 
@@ -262,5 +276,7 @@ int http_reply(int connection, const char* status, const char* headers, const ch
     ssize_t sent_len = tcp_send(connection, buffer, total_len);
 
     free(buffer);
+    buffer = NULL;
+
     return (sent_len == total_len) ? ERR_NONE : ERR_IO;
 }
