@@ -96,9 +96,11 @@ int handle_list_call(int connection) {
 
 
 
+
 int handle_read_call(int connection, const struct http_message* msg) {
     char res_str[15] = {0};
     char img_id[MAX_IMG_ID] = {0};
+
 
 
     // get res and imgID from the image's URI
@@ -150,8 +152,18 @@ int handle_read_call(int connection, const struct http_message* msg) {
         free(image_buffer);
         return ERR_NONE;
     }
+
+    char headers[256];
+    snprintf(headers, sizeof(headers), "Content-Type: image/jpeg\r\n");
+
+    //send HTTP response with the image
+    int http_ret = http_reply(connection, "200 OK", headers, image_buffer, image_size);
     free(image_buffer);
-    return ERR_NONE;
+    image_buffer = NULL;
+    return http_ret;
+
+    /*free(image_buffer);
+    return ERR_NONE;*/
 }
 
 
@@ -200,6 +212,7 @@ int handle_insert_call(int connection, const struct http_message* msg) {
     if (image_buffer == NULL || image_size == 0) {
         return reply_error_msg(connection, ERR_NOT_ENOUGH_ARGUMENTS);
     }
+  
     // Lock the mutex before calling do_insert
     if (pthread_mutex_lock(&thread) != 0) {
         perror("pthread_mutex_lock failed for insert");
@@ -315,6 +328,7 @@ int server_startup (int argc, char **argv) {
         perror("pthread_mutex_init failed");
         return ERR_RUNTIME;
     }
+
     http_init(server_port, handle_http_message);
     printf("ImgFS server started on http://localhost:%u\n", server_port);
     return ERR_NONE;
