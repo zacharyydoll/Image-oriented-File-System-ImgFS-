@@ -20,6 +20,7 @@
 // Main in-memory structure for imgFS
 static struct imgfs_file fs_file;
 static uint16_t server_port;
+pthread_mutex_t thread;
 
 #define URI_ROOT "/imgfs"
 
@@ -55,7 +56,21 @@ static int reply_302_msg(int connection) {
 
 int handle_list_call(int connection) {
     char *json_op = NULL;
+
+    // Lock the mutex before calling do_do_list
+    if (pthread_mutex_lock(&thread) != 0) {
+        perror("pthread_mutex_lock failed for list");
+        return reply_error_msg(connection, ERR_RUNTIME);
+    }
+
     int list_ret = do_list(&fs_file, JSON, &json_op);
+
+    // Unlock the mutex after calling do_do_list
+    if (pthread_mutex_unlock(&thread) != 0) {
+        perror("pthread_mutex_unlock failed for list");
+        return reply_error_msg(connection, ERR_RUNTIME);
+    }
+
 
     if (list_ret != ERR_NONE) {
         if (json_op) free(json_op);
@@ -75,42 +90,6 @@ int handle_list_call(int connection) {
 }
 
 
-
-/*int handle_read_call(int connection, const struct http_message* msg) {
-    char res_str[15] = {0};
-    char img_id[MAX_IMG_ID] = {0};
-
-    // get res and imgID from the image's URI
-    if (http_get_var(&msg->uri, "res", res_str, sizeof(res_str)) == 0 ||
-        http_get_var(&msg->uri, "img_id", img_id, sizeof(img_id)) == 0) {
-        return reply_error_msg(connection, ERR_INVALID_ARGUMENT);
-    }
-
-    //convert resolution string to int value
-    int res = resolution_atoi(res_str);
-    if (res == -1) {
-        return reply_error_msg(connection, ERR_INVALID_ARGUMENT);
-    }
-
-    char *image_buffer;
-    uint32_t image_size;
-    int ret_read = do_read(img_id, res, &image_buffer, &image_size, &fs_file);
-    if (ret_read != ERR_NONE) {
-        return reply_error_msg(connection, ret_read);
-    }
-
-    char headers[256];
-    snprintf(headers, sizeof(headers),
-             "Content-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n", image_size);
-
-    //printf("\nServing image %s with size %u\n", img_id, image_size);
-
-    //send HTTP response with the image
-    int http_ret = http_reply(connection, "200 OK", headers, image_buffer, image_size);
-    free(image_buffer);
-    return http_ret;
-}*/
-
 int handle_read_call(int connection, const struct http_message* msg) {
     char res_str[15] = {0};
     char img_id[MAX_IMG_ID] = {0};
@@ -118,18 +97,32 @@ int handle_read_call(int connection, const struct http_message* msg) {
     // Get res and imgID from the image's URI
     if (http_get_var(&msg->uri, "res", res_str, sizeof(res_str)) == 0 ||
         http_get_var(&msg->uri, "img_id", img_id, sizeof(img_id)) == 0) {
-        return reply_error_msg(connection, ERR_INVALID_ARGUMENT);
+        return reply_error_msg(connection, ERR_NOT_ENOUGH_ARGUMENTS);
     }
 
     //convert resolution string to int value
     int res = resolution_atoi(res_str);
     if (res == -1) {
-        return reply_error_msg(connection, ERR_INVALID_ARGUMENT);
+        return reply_error_msg(connection, ERR_RESOLUTIONS);
     }
 
     char *image_buffer;
     uint32_t image_size;
+
+    // Lock the mutex before calling do_read
+    if (pthread_mutex_lock(&thread) != 0) {
+        perror("pthread_mutex_lock failed for read");
+        return reply_error_msg(connection, ERR_RUNTIME);
+    }
+
     int ret_read = do_read(img_id, res, &image_buffer, &image_size, &fs_file);
+
+    // Unlock the mutex after calling do_read
+    if (pthread_mutex_unlock(&thread) != 0) {
+        perror("pthread_mutex_unlock failed for read");
+        return reply_error_msg(connection, ERR_RUNTIME);
+    }
+
     if (ret_read != ERR_NONE) {
         return reply_error_msg(connection, ret_read);
     }
@@ -137,15 +130,12 @@ int handle_read_call(int connection, const struct http_message* msg) {
     char headers[256];
     snprintf(headers, sizeof(headers), "Content-Type: image/jpeg\r\n");
 
-    // Debugging output
-    //printf("Serving image %s with size %u\n", img_id, image_size);
-
     //send HTTP response with the image
     int http_ret = http_reply(connection, "200 OK", headers, image_buffer, image_size);
     free(image_buffer);
+    image_buffer = NULL;
     return http_ret;
 }
-
 
 
 int handle_delete_call(int connection, const struct http_message* msg) {
@@ -153,10 +143,23 @@ int handle_delete_call(int connection, const struct http_message* msg) {
 
     // extract imgID from image's URI
     if (http_get_var(&msg->uri, "img_id", img_id, sizeof(img_id)) == 0) {
-        return reply_error_msg(connection, ERR_INVALID_ARGUMENT);
+        return reply_error_msg(connection, ERR_NOT_ENOUGH_ARGUMENTS);
+    }
+
+    // Lock the mutex before calling do_delete
+    if (pthread_mutex_lock(&thread) != 0) {
+        perror("pthread_mutex_lock failed for delete");
+        return reply_error_msg(connection, ERR_RUNTIME);
     }
 
     int ret_delete = do_delete(img_id, &fs_file);
+
+    // Unlock the mutex after calling do_delete
+    if (pthread_mutex_unlock(&thread) != 0) {
+        perror("pthread_mutex_unlock failed for delete");
+        return reply_error_msg(connection, ERR_RUNTIME);
+    }
+
     if (ret_delete != ERR_NONE) {
         return reply_error_msg(connection, ret_delete);
     }
@@ -176,7 +179,20 @@ int handle_insert_call(int connection, const struct http_message* msg) {
     const char *image_buffer = msg->body.val;
     size_t image_size = msg->body.len;
 
+    // Lock the mutex before calling do_insert
+    if (pthread_mutex_lock(&thread) != 0) {
+        perror("pthread_mutex_lock failed for insert");
+        return reply_error_msg(connection, ERR_RUNTIME);
+    }
+
     int ret = do_insert(image_buffer, image_size, name, &fs_file);
+
+    // Unlock the mutex after calling do_insert
+    if (pthread_mutex_unlock(&thread) != 0) {
+        perror("pthread_mutex_unlock failed for insert");
+        return reply_error_msg(connection, ERR_RUNTIME);
+    }
+    
     if (ret != ERR_NONE) {
         return reply_error_msg(connection, ret);
     }
@@ -255,6 +271,11 @@ int server_startup (int argc, char **argv) {
     } else {
         server_port = DEFAULT_LISTENING_PORT;
     }
+    // Initialize the global mutex
+    if (pthread_mutex_init(&thread, NULL) != 0) {
+        perror("pthread_mutex_init failed");
+        return ERR_RUNTIME;
+    }
 
     http_init(server_port, handle_http_message);
     printf("ImgFS server started on http://localhost:%u\n", server_port);
@@ -269,6 +290,10 @@ void server_shutdown (void) {
     http_close();
     do_close(&fs_file);
     vips_shutdown();
+    // Destroy the global mutex
+    if (pthread_mutex_destroy(&thread) != 0) {
+        perror("pthread_mutex_destroy failed");
+    }
 }
 
 
