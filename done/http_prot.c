@@ -162,14 +162,15 @@ int http_parse_message(const char *stream, size_t bytes_received, struct http_me
     struct http_string http_version;
     current = get_next_token(current, HTTP_LINE_DELIM, &http_version);
 
-    // parse headers
-    //const char *body_start = http_parse_headers(stream, out);
+
+
     // Parse headers
     current = http_parse_headers(current, out);
 
     if (out->num_headers == 0) {
         return 0;  // no headers parsed
     }
+
 
     // extract content length from headers
     *content_len = 0;
@@ -193,14 +194,18 @@ int http_parse_message(const char *stream, size_t bytes_received, struct http_me
             out->body.val = NULL;
             out->body.len = 0;  //incomplete body
             return 0;
-        } else {
+        }else{
             out->body.val = header_end + strlen(HTTP_HDR_END_DELIM);
             out->body.len = *content_len;
         }
+
+
     }
+
 
     return 1;  // msg fully received and parsed w/o a body
 }
+
 //==================================================================================================================
 //==================================================================================================================
 //==================================================================================================================

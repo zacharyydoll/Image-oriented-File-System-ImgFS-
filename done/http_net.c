@@ -42,14 +42,13 @@ static void *handle_connection(void *arg) {
     sigaddset(&mask, SIGTERM);
     pthread_sigmask(SIG_BLOCK, &mask, NULL);
 
+
     int client_fd = *(int *)arg;
+
 
     // buffer for the http header - used allocation so that I can assign new value to it
     char *rcvbuf = malloc(MAX_HEADER_SIZE);
-    if (rcvbuf == NULL) {
-        close(client_fd);
-        return &our_ERR_OUT_OF_MEMORY;
-    }
+    if (rcvbuf == NULL) return &our_ERR_OUT_OF_MEMORY;
 
     int read_bytes = 0;
     char *header_end = NULL;
@@ -59,11 +58,14 @@ static void *handle_connection(void *arg) {
     struct http_message message;
 
     do {
-        ssize_t num_bytes_read = tcp_read(client_fd, rcvbuf + read_bytes, MAX_HEADER_SIZE - read_bytes - 1);
+        ssize_t num_bytes_read = tcp_read(client_fd,
+                                          rcvbuf + read_bytes,
+                                          MAX_HEADER_SIZE - read_bytes - 1);
         if (num_bytes_read <= 0) {
             free(rcvbuf);
             rcvbuf = NULL;
             close(client_fd);
+          
             return &our_ERR_IO;
         }
         read_bytes += (int)num_bytes_read;
@@ -74,11 +76,12 @@ static void *handle_connection(void *arg) {
 
         //=============================================WEEK 12==========================================================
 
-        int ret_parsed_mess = http_parse_message(rcvbuf, read_bytes, &message, &content_len);
+        int ret_parsed_mess = http_parse_message(rcvbuf,read_bytes,&message, &content_len);
         if (ret_parsed_mess < 0) {
-            free(rcvbuf);
+            free(rcvbuf); // parse_message returns negative if an error occurred (http_prot.h)
             rcvbuf = NULL;
             close(client_fd);
+
             return &our_ERR_IO;
         } else if (ret_parsed_mess == 0) { // partial treatment (see http_prot.h)
             if (!extended && content_len > 0 && read_bytes < MAX_HEADER_SIZE + content_len) {
@@ -87,30 +90,38 @@ static void *handle_connection(void *arg) {
                     free(rcvbuf);
                     rcvbuf = NULL;
                     close(client_fd);
+
                     return &our_ERR_OUT_OF_MEMORY;
                 }
                 rcvbuf = new_buf;
                 extended = 1;
             }
         } else { // case where the message was fully received and parsed
-            if (cb(&message, client_fd) < 0) {
+            int callback_result = cb(&message, client_fd);
+            if (callback_result < 0) {
                 free(rcvbuf);
                 rcvbuf = NULL;
                 close(client_fd);
+              
                 return &our_ERR_IO;
+            } else {
+                read_bytes = 0;
+                content_len = 0;
+                extended = 0;
+                memset(rcvbuf, 0, MAX_HEADER_SIZE);
             }
-            read_bytes = 0;
-            content_len = 0;
-            extended = 0;
-            memset(rcvbuf, 0, MAX_HEADER_SIZE);
         }
-    } while (!header_end && read_bytes < MAX_HEADER_SIZE); // do this until delimiter is found, or buffer is full
+    } while (!header_end && read_bytes < MAX_HEADER_SIZE);  // do this until delimiter is found, or buffer is full
 
     free(rcvbuf);
     rcvbuf = NULL;
     close(client_fd);
+    free(arg);
+  
     return &our_ERR_NONE;
 }
+
+
 
 
 
@@ -183,7 +194,8 @@ int http_receive(void) {
 /*******************************************************************
  * Serve a file content over HTTP
  */
-int http_serve_file(int connection, const char* filename) {
+int http_serve_file(int connection, const char* filename)
+{
     M_REQUIRE_NON_NULL(filename);
 
     // open file
