@@ -181,3 +181,10 @@ void do_close(struct imgfs_file *imgfs_file)
         }
     } else return; // Nothing to close or free
 }
+
+void safe_free(void** ptr) {
+    if (ptr != NULL && *ptr != NULL) {
+        free(*ptr);
+        *ptr = NULL;
+    }
+}

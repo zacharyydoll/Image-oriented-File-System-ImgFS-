@@ -211,6 +211,13 @@ int do_insert(const char *image_buffer, size_t image_size,
  */
 int do_gbcollect(const char *imgfs_path, const char *imgfs_tmp_bkp_path);
 
+/**
+ * @brief Sets a pointer to NULL after freeing it for safe freeing.
+ *
+ * @param ptr The pointer to be freed.
+ */
+void safe_free(void** ptr);
+
 #ifdef __cplusplus
 }
 #endif

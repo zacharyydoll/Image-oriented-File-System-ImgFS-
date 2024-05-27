@@ -202,7 +202,6 @@ int http_parse_message(const char *stream, size_t bytes_received, struct http_me
 
     }
 
-
     return 1;  // msg fully received and parsed w/o a body
 }
 
