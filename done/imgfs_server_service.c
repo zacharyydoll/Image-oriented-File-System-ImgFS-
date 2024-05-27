@@ -71,7 +71,6 @@ int handle_list_call(int connection) {
         return reply_error_msg(connection, ERR_RUNTIME);
     }
 
-
     if (list_ret != ERR_NONE) {
         if (json_op) free(json_op);
         return reply_error_msg(connection, list_ret);
@@ -172,7 +171,7 @@ int handle_insert_call(int connection, const struct http_message* msg) {
 
     // extract name from URI
     if (http_get_var(&msg->uri, "name", name, sizeof(name)) == 0) {
-        return reply_error_msg(connection, ERR_INVALID_ARGUMENT);
+        return reply_error_msg(connection, ERR_NOT_ENOUGH_ARGUMENTS);
     }
 
     // get image content from POST body

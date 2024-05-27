@@ -31,95 +31,93 @@ MK_OUR_ERR(ERR_OUT_OF_MEMORY);
 MK_OUR_ERR(ERR_IO);
 
 /*******************************************************************
- * Handle connection
+ * @brief Helper function to handle cleanup and return error code.
+ *
+ * @param client_fd The client file descriptor.
+ * @param arg The argument to be freed.
+ * @param rcvbuf The pointer to the buffer to be freed.
+ * @param error_code The error code to return.
+ * @return The error code passed as an argument.
+ */
+static void *safe_free(int client_fd, void* arg, char* rcvbuf, void* error_code) {
+    if (arg == NULL || rcvbuf == NULL || error_code == NULL) return &our_ERR_INVALID_ARGUMENT;
+    free(rcvbuf);
+    //close(client_fd);
+    free(arg);
+    return error_code;
+}
+
+
+/*******************************************************************
+ * @brief Handle the client connection and process the HTTP message.
+ *
+ * @param arg The argument passed to the thread (client file descriptor).
+ * @return The error code on failure, or success code on completion.
  */
 static void *handle_connection(void *arg) {
     if (arg == NULL) return &our_ERR_INVALID_ARGUMENT;
 
     sigset_t mask;
     sigemptyset(&mask);
-    sigaddset(&mask, SIGINT );
+    sigaddset(&mask, SIGINT);
     sigaddset(&mask, SIGTERM);
     pthread_sigmask(SIG_BLOCK, &mask, NULL);
 
-
     int client_fd = *(int *)arg;
 
+    size_t max_buff_sz = MAX_HEADER_SIZE; // ZAC 27.05: using max_buffer_size for dynamic resizing
+    char *rcvbuf = malloc(max_buff_sz); // ZAC 27.05: initialize buffer with max_buffer_size
+    if (rcvbuf == NULL) {
+        free(arg); // ZAC 27.05: free the argument before returning
+        return &our_ERR_OUT_OF_MEMORY;
+    }
 
-    // buffer for the http header - used allocation so that I can assign new value to it
-    char *rcvbuf = malloc(MAX_HEADER_SIZE);
-    if (rcvbuf == NULL) return &our_ERR_OUT_OF_MEMORY;
-
-    int read_bytes = 0;
+    ssize_t read_bytes = 0;
     char *header_end = NULL;
-    int content_len = 0; // ZAC: explicitly initialized content length to 0.
+    int content_len = 0;
     int extended = 0;
 
     struct http_message message;
+    int parse_result = 0; // ZAC 27.05: add parse_result to track parsing
 
     do {
-        ssize_t num_bytes_read = tcp_read(client_fd,
-                                          rcvbuf + read_bytes,
-                                          MAX_HEADER_SIZE - read_bytes - 1);
+        ssize_t num_bytes_read = tcp_read(client_fd, rcvbuf + read_bytes,
+                                          max_buff_sz - read_bytes - 1);
         if (num_bytes_read <= 0) {
-            free(rcvbuf);
-            rcvbuf = NULL;
-            close(client_fd);
-          
-            return &our_ERR_IO;
+            return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
         }
-        read_bytes += (int)num_bytes_read;
+
+        read_bytes += num_bytes_read;
         rcvbuf[read_bytes] = '\0'; // null terminate string for safety
+        header_end = strstr(rcvbuf, HTTP_HDR_END_DELIM); // "\r\n\r\n"
 
-        // search for the header delimiter
-        header_end = strstr(rcvbuf, HTTP_HDR_END_DELIM);  // "\r\n\r\n"
-
-        //=============================================WEEK 12==========================================================
-
-        int ret_parsed_mess = http_parse_message(rcvbuf,read_bytes,&message, &content_len);
-        if (ret_parsed_mess < 0) {
-            free(rcvbuf); // parse_message returns negative if an error occurred (http_prot.h)
-            rcvbuf = NULL;
-            close(client_fd);
-
-            return &our_ERR_IO;
-        } else if (ret_parsed_mess == 0) { // partial treatment (see http_prot.h)
-            if (!extended && content_len > 0 && read_bytes < content_len) {
-                char *new_buf = realloc(rcvbuf, MAX_HEADER_SIZE + content_len);
-                if (!new_buf) {
-                    free(rcvbuf);
-                    rcvbuf = NULL;
-                    close(client_fd);
-
-                    return &our_ERR_OUT_OF_MEMORY;
-                }
-                rcvbuf = new_buf;
-                extended = 1;
-            }
-        } else { // case where the message was fully received and parsed
-            int callback_result = cb(&message, client_fd);
-            if (callback_result < 0) {
-                free(rcvbuf);
-                rcvbuf = NULL;
-                close(client_fd);
-              
-                return &our_ERR_IO;
-            } else {
-                read_bytes = 0;
-                content_len = 0;
-                extended = 0;
-                memset(rcvbuf, 0, MAX_HEADER_SIZE);
-            }
+        parse_result = http_parse_message(rcvbuf, read_bytes, &message, &content_len);
+        if (parse_result < 0) {
+            return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
         }
-    } while (!header_end && read_bytes < MAX_HEADER_SIZE);  // do this until delimiter is found, or buffer is full
 
-    free(rcvbuf);
-    rcvbuf = NULL;
-    close(client_fd);
-    free(arg);
-  
-    return &our_ERR_NONE;
+        if (parse_result == 0 && content_len > 0 && read_bytes < MAX_HEADER_SIZE + content_len) {
+            max_buff_sz = MAX_HEADER_SIZE + content_len; // ZAC 27.05: update max_buffer_size
+            char *new_buf = realloc(rcvbuf, max_buff_sz); // ZAC 27.05: use max_buffer_size for realloc
+            if (!new_buf)
+                return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
+
+            rcvbuf = new_buf;
+            extended = 1;
+        }
+    } while (parse_result == 0 && read_bytes < max_buff_sz); // NEW VERSION: use parse_result and max_buffer_size
+
+    if (parse_result > 0) { // ZAC 27.05: process the fully parsed message
+        if (cb) {
+            int callback_result = cb(&message, client_fd); // NEW VERSION: handle callback result
+            if (callback_result < 0)
+                return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
+        }
+    } else return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
+
+    return safe_free(client_fd, arg, rcvbuf, &our_ERR_NONE);
 }
+
 
 
 
@@ -160,6 +158,7 @@ int http_receive(void) {
 
     if (!active_socket) {
         // Memory allocation failed, return error
+        free(active_socket);
         return ERR_OUT_OF_MEMORY;
     }
     *active_socket = tcp_accept(passive_socket);
