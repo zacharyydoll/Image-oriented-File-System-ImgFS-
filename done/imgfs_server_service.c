@@ -27,26 +27,21 @@ pthread_mutex_t thread;
 /**********************************************************************
  * Sends error message.
  ********************************************************************** */
-static int reply_error_msg(int connection, int error)
-{
+static int reply_error_msg(int connection, int error) {
 #define ERR_MSG_SIZE 256
     char err_msg[ERR_MSG_SIZE]; // enough for any reasonable err_msg
     if (snprintf(err_msg, ERR_MSG_SIZE, "Error: %s\n", ERR_MSG(error)) < 0) {
         fprintf(stderr, "reply_error_msg(): sprintf() failed...\n");
-        return ERR_IO;
+        return ERR_RUNTIME;
     }
-
-    http_reply(connection, "500 Internal Server Error", err_msg,
-               "debug", 0);
-    return error;
-
+    return http_reply(connection, "500 Internal Server Error", "",
+                      err_msg, strlen(err_msg));
 }
 
 /**********************************************************************
  * Sends 302 OK message.
  ********************************************************************** */
-static int reply_302_msg(int connection)
-{
+static int reply_302_msg(int connection) {
     char location[ERR_MSG_SIZE];
     if (snprintf(location, ERR_MSG_SIZE, "Location: http://localhost:%d/" BASE_FILE HTTP_LINE_DELIM,
                  server_port) < 0) {
@@ -66,7 +61,6 @@ int handle_list_call(int connection) {
     if (pthread_mutex_lock(&thread) != 0) {
         perror("pthread_mutex_lock failed for list");
         return reply_error_msg(connection, ERR_RUNTIME);
-
     }
 
     int list_ret = do_list(&fs_file, JSON, &json_op);
@@ -84,26 +78,23 @@ int handle_list_call(int connection) {
     }
 
     if (json_op) {
-        printf("Sending JSON response: %s\n", json_op);//debug print
+        //printf("Sending JSON response: %s\n", json_op);//debug print
         int ret = http_reply(connection, "200 OK", "Content-Type: application/json\r\n",
                              json_op, strlen(json_op));
 
         free(json_op);
         return ret;
     }
+
     return reply_error_msg(connection, ERR_RUNTIME);
 }
-
-
 
 
 int handle_read_call(int connection, const struct http_message* msg) {
     char res_str[15] = {0};
     char img_id[MAX_IMG_ID] = {0};
 
-
-
-    // get res and imgID from the image's URI
+    // Get res and imgID from the image's URI
     if (http_get_var(&msg->uri, "res", res_str, sizeof(res_str)) == 0 ||
         http_get_var(&msg->uri, "img_id", img_id, sizeof(img_id)) == 0) {
         return reply_error_msg(connection, ERR_NOT_ENOUGH_ARGUMENTS);
@@ -112,12 +103,11 @@ int handle_read_call(int connection, const struct http_message* msg) {
     //convert resolution string to int value
     int res = resolution_atoi(res_str);
     if (res == -1) {
-        //change_sara : fixed error type
         return reply_error_msg(connection, ERR_RESOLUTIONS);
     }
 
-    char *image_buffer ;
-    uint32_t image_size = 0; //
+    char *image_buffer;
+    uint32_t image_size;
 
     // Lock the mutex before calling do_read
     if (pthread_mutex_lock(&thread) != 0) {
@@ -134,23 +124,7 @@ int handle_read_call(int connection, const struct http_message* msg) {
     }
 
     if (ret_read != ERR_NONE) {
-        if (image_buffer != NULL) {
-            free(image_buffer);  // Free the buffer if it was allocated
-        }
-        // Send error response without extra headers and with Content-Length: 0
         return reply_error_msg(connection, ret_read);
-    }else {
-        // Prepare the headers
-        char headers[256];
-        snprintf(headers, sizeof(headers),
-                 "Content-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n", image_size);
-
-        // Send the HTTP response with the image
-        http_reply(connection, "200 OK", headers, image_buffer, image_size);
-
-        // Free the image buffer
-        free(image_buffer);
-        return ERR_NONE;
     }
 
     char headers[256];
@@ -161,9 +135,6 @@ int handle_read_call(int connection, const struct http_message* msg) {
     free(image_buffer);
     image_buffer = NULL;
     return http_ret;
-
-    /*free(image_buffer);
-    return ERR_NONE;*/
 }
 
 
@@ -201,18 +172,13 @@ int handle_insert_call(int connection, const struct http_message* msg) {
 
     // extract name from URI
     if (http_get_var(&msg->uri, "name", name, sizeof(name)) == 0) {
-        return reply_error_msg(connection, ERR_NOT_ENOUGH_ARGUMENTS);
+        return reply_error_msg(connection, ERR_INVALID_ARGUMENT);
     }
 
     // get image content from POST body
     const char *image_buffer = msg->body.val;
     size_t image_size = msg->body.len;
 
-    // Check if image content is present
-    if (image_buffer == NULL || image_size == 0) {
-        return reply_error_msg(connection, ERR_NOT_ENOUGH_ARGUMENTS);
-    }
-  
     // Lock the mutex before calling do_insert
     if (pthread_mutex_lock(&thread) != 0) {
         perror("pthread_mutex_lock failed for insert");
@@ -247,54 +213,36 @@ int handle_http_message(struct http_message* msg, int connection) {
                  connection,
                  (int) msg->uri.len, msg->uri.val);
 
-    printf("Handling HTTP message with URI: %.*s\n", (int) msg->uri.len, msg->uri.val);  // Debug print
+    //printf("Handling HTTP message with URI: %.*s\n", (int) msg->uri.len, msg->uri.val);  // Debug print
+
+    if (http_match_verb(&msg->uri, "/") || http_match_uri(msg, "/index.html")) {
+        return http_serve_file(connection, BASE_FILE);
+    }
 
     if (http_match_verb(&msg->method, "GET")) {
         if (http_match_uri(msg, URI_ROOT "/list")) {
-            printf("Handling GET imgfs list\n");//debug print
+            //printf("Handling GET imgfs list\n");//debug print
             return handle_list_call(connection);
         }
         if (http_match_uri(msg, URI_ROOT "/read")) {
-            printf("Handling GET imgfs read\n");//debug print
+            //printf("Handling GET imgfs read\n");//debug print
             return handle_read_call(connection, msg);
         }
         if (http_match_uri(msg, URI_ROOT "/delete")) {
-            printf("Handling GET imgfs delete\n");//debug print
+            //printf("Handling GET imgfs delete\n");//debug print
             return handle_delete_call(connection, msg);
-        }
-        if (http_match_uri(msg, "/") || http_match_uri(msg, "/index.html")) {
-            printf("Handling GET or index.html\n");//debug print
-            return http_serve_file(connection, BASE_FILE);
         }
     }
 
     if (http_match_verb(&msg->method, "POST") &&
         http_match_uri(msg, URI_ROOT "/insert")) {
-        printf("Handling POST /imgfs/insert\n");//debug print
+        //printf("Handling POST /imgfs/insert\n");//debug print
         return handle_insert_call(connection, msg);
     }
 
-    printf("Invalid command: %.*s\n", (int) msg->uri.len, msg->uri.val);
-    reply_error_msg(connection, ERR_INVALID_COMMAND);
-    return ERR_INVALID_COMMAND;
+    //printf("Invalid command: %.*s\n", (int) msg->uri.len, msg->uri.val);
+    return reply_error_msg(connection, ERR_INVALID_COMMAND);
 }
-
-
-/*int handle_http_message(struct http_message* msg, int connection)
-{
-    M_REQUIRE_NON_NULL(msg);
-    debug_printf("handle_http_message() on connection %d. URI: %.*s\n",
-                 connection,
-                 (int) msg->uri.len, msg->uri.val);
-    if (http_match_uri(msg, URI_ROOT "/list")      ||
-        (http_match_uri(msg, URI_ROOT "/insert")
-         && http_match_verb(&msg->method, "POST")) ||
-        http_match_uri(msg, URI_ROOT "/read")      ||
-        http_match_uri(msg, URI_ROOT "/delete"))
-        return reply_302_msg(connection);
-    else
-        return reply_error_msg(connection, ERR_INVALID_COMMAND);
-}*/
 
 
 /********************************************************************//**
@@ -337,8 +285,7 @@ int server_startup (int argc, char **argv) {
 /********************************************************************//**
  * Shutdown function. Free the structures and close the file.
  ********************************************************************** */
-void server_shutdown (void)
-{
+void server_shutdown (void) {
     fprintf(stderr, "Shutting down...\n");
     http_close();
     do_close(&fs_file);
@@ -348,6 +295,3 @@ void server_shutdown (void)
         perror("pthread_mutex_destroy failed");
     }
 }
-
-
-

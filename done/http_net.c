@@ -84,7 +84,7 @@ static void *handle_connection(void *arg) {
 
             return &our_ERR_IO;
         } else if (ret_parsed_mess == 0) { // partial treatment (see http_prot.h)
-            if (!extended && content_len > 0 && read_bytes < MAX_HEADER_SIZE + content_len) {
+            if (!extended && content_len > 0 && read_bytes < content_len) {
                 char *new_buf = realloc(rcvbuf, MAX_HEADER_SIZE + content_len);
                 if (!new_buf) {
                     free(rcvbuf);
