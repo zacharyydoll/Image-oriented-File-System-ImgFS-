@@ -24,6 +24,7 @@ pthread_mutex_t thread;
 
 #define URI_ROOT "/imgfs"
 
+
 /**********************************************************************
  * Sends error message.
  ********************************************************************** */
@@ -38,6 +39,7 @@ static int reply_error_msg(int connection, int error) {
                       err_msg, strlen(err_msg));
 }
 
+
 /**********************************************************************
  * Sends 302 OK message.
  ********************************************************************** */
@@ -51,8 +53,6 @@ static int reply_302_msg(int connection) {
     return http_reply(connection, "302 Found", location, "", 0);
 }
 
-
-// WEEK 13 =============================================================================================================
 
 int handle_list_call(int connection) {
     char *json_op = NULL;
@@ -91,6 +91,7 @@ int handle_list_call(int connection) {
 
 
 int handle_read_call(int connection, const struct http_message* msg) {
+    M_REQUIRE_NON_NULL(msg);
     char res_str[15] = {0};
     char img_id[MAX_IMG_ID] = {0};
 
@@ -139,6 +140,7 @@ int handle_read_call(int connection, const struct http_message* msg) {
 
 
 int handle_delete_call(int connection, const struct http_message* msg) {
+    M_REQUIRE_NON_NULL(msg);
     char img_id[MAX_IMG_ID] = {0};
 
     // extract imgID from image's URI
@@ -168,11 +170,12 @@ int handle_delete_call(int connection, const struct http_message* msg) {
 }
 
 int handle_insert_call(int connection, const struct http_message* msg) {
+    M_REQUIRE_NON_NULL(msg);
     char name[256] = {0};
 
     // extract name from URI
     if (http_get_var(&msg->uri, "name", name, sizeof(name)) == 0) {
-        return reply_error_msg(connection, ERR_INVALID_ARGUMENT);
+        return reply_error_msg(connection, ERR_NOT_ENOUGH_ARGUMENTS);
     }
 
     // get image content from POST body
@@ -201,8 +204,6 @@ int handle_insert_call(int connection, const struct http_message* msg) {
     return reply_302_msg(connection);
 }
 
-// WEEK 13 =============================================================================================================
-
 
 /**********************************************************************
  * Simple handling of http message. TO BE UPDATED WEEK 13
@@ -213,34 +214,27 @@ int handle_http_message(struct http_message* msg, int connection) {
                  connection,
                  (int) msg->uri.len, msg->uri.val);
 
-    //printf("Handling HTTP message with URI: %.*s\n", (int) msg->uri.len, msg->uri.val);  // Debug print
-
     if (http_match_verb(&msg->uri, "/") || http_match_uri(msg, "/index.html")) {
         return http_serve_file(connection, BASE_FILE);
     }
 
     if (http_match_verb(&msg->method, "GET")) {
         if (http_match_uri(msg, URI_ROOT "/list")) {
-            //printf("Handling GET imgfs list\n");//debug print
             return handle_list_call(connection);
         }
         if (http_match_uri(msg, URI_ROOT "/read")) {
-            //printf("Handling GET imgfs read\n");//debug print
             return handle_read_call(connection, msg);
         }
         if (http_match_uri(msg, URI_ROOT "/delete")) {
-            //printf("Handling GET imgfs delete\n");//debug print
             return handle_delete_call(connection, msg);
         }
     }
 
     if (http_match_verb(&msg->method, "POST") &&
         http_match_uri(msg, URI_ROOT "/insert")) {
-        //printf("Handling POST /imgfs/insert\n");//debug print
         return handle_insert_call(connection, msg);
     }
 
-    //printf("Invalid command: %.*s\n", (int) msg->uri.len, msg->uri.val);
     return reply_error_msg(connection, ERR_INVALID_COMMAND);
 }
 
@@ -250,6 +244,7 @@ int handle_http_message(struct http_message* msg, int connection) {
  * Pass the imgFS file name as argv[1] and optionnaly port number as argv[2]
  ********************************************************************** */
 int server_startup (int argc, char **argv) {
+    M_REQUIRE_NON_NULL(argv);
     if (argc < 2) return ERR_NOT_ENOUGH_ARGUMENTS;
     M_REQUIRE_NON_NULL(argv);
 
@@ -281,6 +276,7 @@ int server_startup (int argc, char **argv) {
     printf("ImgFS server started on http://localhost:%u\n", server_port);
     return ERR_NONE;
 }
+
 
 /********************************************************************//**
  * Shutdown function. Free the structures and close the file.

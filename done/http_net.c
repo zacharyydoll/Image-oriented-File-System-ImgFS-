@@ -41,6 +41,7 @@ MK_OUR_ERR(ERR_IO);
  * @return The error code passed as an argument.
  */
 static void *safe_free(int client_fd, void* arg, char* rcvbuf, void* error_code) {
+    if (arg == NULL || rcvbuf == NULL || error_code == NULL) return &our_ERR_INVALID_ARGUMENT;
     free(rcvbuf);
     close(client_fd);
     free(arg);
@@ -114,7 +115,6 @@ static void *handle_connection(void *arg) {
                 return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
         }
     } else return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
-
 
     return safe_free(client_fd, arg, rcvbuf, &our_ERR_NONE);
 }
