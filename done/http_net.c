@@ -31,7 +31,24 @@ MK_OUR_ERR(ERR_OUT_OF_MEMORY);
 MK_OUR_ERR(ERR_IO);
 
 
-/**
+/*******************************************************************
+ * @brief Helper function to handle cleanup and return error code.
+ *
+ * @param client_fd The client file descriptor.
+ * @param arg The argument to be freed.
+ * @param rcvbuf The pointer to the buffer to be freed.
+ * @param error_code The error code to return.
+ * @return The error code passed as an argument.
+ */
+static void *safe_free(int client_fd, void* arg, char* rcvbuf, void* error_code) {
+    free(rcvbuf);
+    close(client_fd);
+    free(arg);
+    return error_code;
+}
+
+
+/*******************************************************************
  * @brief Handle the client connection and process the HTTP message.
  *
  * @param arg The argument passed to the thread (client file descriptor).
@@ -67,34 +84,24 @@ static void *handle_connection(void *arg) {
         ssize_t num_bytes_read = tcp_read(client_fd, rcvbuf + read_bytes,
                                           max_buff_sz - read_bytes - 1);
         if (num_bytes_read <= 0) {
-            free(rcvbuf);
-            close(client_fd);
-            free(arg); // ZAC 27.05: free the argument before returning
-            return &our_ERR_IO;
+            return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
         }
 
         read_bytes += num_bytes_read;
         rcvbuf[read_bytes] = '\0'; // null terminate string for safety
-
         header_end = strstr(rcvbuf, HTTP_HDR_END_DELIM); // "\r\n\r\n"
 
         parse_result = http_parse_message(rcvbuf, read_bytes, &message, &content_len);
         if (parse_result < 0) {
-            free(rcvbuf); // parse_message returns negative if an error occurred (http_prot.h)
-            close(client_fd);
-            free(arg); // ZAC 27.05: free the argument before returning
-            return &our_ERR_IO;
+            return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
         }
 
-        if (parse_result == 0 && content_len > 0 && read_bytes < MAX_HEADER_SIZE + content_len) { // NEW VERSION: update condition
+        if (parse_result == 0 && content_len > 0 && read_bytes < MAX_HEADER_SIZE + content_len) {
             max_buff_sz = MAX_HEADER_SIZE + content_len; // ZAC 27.05: update max_buffer_size
             char *new_buf = realloc(rcvbuf, max_buff_sz); // ZAC 27.05: use max_buffer_size for realloc
-            if (!new_buf) {
-                free(rcvbuf);
-                close(client_fd);
-                free(arg); // ZAC 27.05: free argument before returning
-                return &our_ERR_OUT_OF_MEMORY;
-            }
+            if (!new_buf)
+                return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
+
             rcvbuf = new_buf;
             extended = 1;
         }
@@ -103,24 +110,13 @@ static void *handle_connection(void *arg) {
     if (parse_result > 0) { // ZAC 27.05: process the fully parsed message
         if (cb) {
             int callback_result = cb(&message, client_fd); // NEW VERSION: handle callback result
-            if (callback_result < 0) {
-                free(rcvbuf);
-                close(client_fd);
-                free(arg); // NEW VERSION: free the argument before returning
-                return &our_ERR_IO;
-            }
+            if (callback_result < 0)
+                return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
         }
-    } else {
-        free(rcvbuf);
-        close(client_fd);
-        free(arg); // NEW VERSION: free the argument before returning
-        return &our_ERR_IO;
-    }
+    } else return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
 
-    free(rcvbuf);
-    close(client_fd);
-    free(arg); // NEW VERSION: free the argument at the end
-    return &our_ERR_NONE;
+
+    return safe_free(client_fd, arg, rcvbuf, &our_ERR_NONE);
 }
 
 
