@@ -5,6 +5,21 @@
 #include <netinet/in.h>
 #include <string.h>
 
+/**
+ * This is a help function that logs an error message and closes a given socket,
+ * then returns a constant error code.
+ *
+ * @param err_mess  The error message to be logged.
+ * @param socket_tcp  The socket to be closed.
+ *
+ * @return ERR_IO  A constant int that represents an I/O error.
+ */
+int close_after_error(char* err_mess,int socket_tcp){
+    perror(err_mess);
+    close(socket_tcp);
+    return ERR_IO;
+}
+
 
 int tcp_server_init(uint16_t port){
     int socket_tcp ;
@@ -15,10 +30,9 @@ int tcp_server_init(uint16_t port){
 
     socket_tcp = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
     if(socket_tcp<0){
-        perror("Error creating socket");
-        close(socket_tcp);
-        return ERR_IO;
+        close_after_error("Error creating socket",socket_tcp);
     }
+
     bzero(&server_addr, sizeof(server_addr));
     // Use Internet address family
     server_addr.sin_family = AF_INET;
@@ -30,16 +44,12 @@ int tcp_server_init(uint16_t port){
 
     //Binding the socket
     if (bind(socket_tcp, (struct sockaddr *) &server_addr, sizeof(server_addr)) != 0) {
-        perror("Error binding socket");
-        close(socket_tcp);
-        return ERR_IO;
+        close_after_error("Error binding socket",socket_tcp);
     }
 
     //Listening
     if (listen(socket_tcp, SOMAXCONN) < 0) { //not sure : CHECK HOW MANY connections
-        perror("Error listening on socket");
-        close(socket_tcp);
-        return ERR_IO;
+        close_after_error("Error listening on socket",socket_tcp);
     }
 
     return socket_tcp;

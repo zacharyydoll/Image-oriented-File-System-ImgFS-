@@ -65,12 +65,7 @@ static void *handle_connection(void *arg) {
 
     int client_fd = *(int *)arg;
 
-    size_t max_buff_sz = MAX_HEADER_SIZE; // ZAC 27.05: using max_buffer_size for dynamic resizing
-    char *rcvbuf = malloc(max_buff_sz); // ZAC 27.05: initialize buffer with max_buffer_size
-    if (rcvbuf == NULL) {
-        free(arg); // ZAC 27.05: free the argument before returning
-        return &our_ERR_OUT_OF_MEMORY;
-    }
+
 
     ssize_t read_bytes = 0;
     char *header_end = NULL;
@@ -79,43 +74,74 @@ static void *handle_connection(void *arg) {
 
     struct http_message message;
     int parse_result = 0; // ZAC 27.05: add parse_result to track parsing
+    ssize_t num_bytes_read = -7;
+
+    size_t max_buff_sz = MAX_HEADER_SIZE; // ZAC 27.05: using max_buffer_size for dynamic resizing
+    char *rcvbuf = calloc(1,max_buff_sz); // ZAC 27.05: initialize buffer with max_buffer_size
+    if (rcvbuf == NULL) {
+        free(arg); // ZAC 27.05: free the argument before returning
+        return &our_ERR_OUT_OF_MEMORY;
+    }
 
     do {
-        ssize_t num_bytes_read = tcp_read(client_fd, rcvbuf + read_bytes,
-                                          max_buff_sz - read_bytes - 1);
-        if (num_bytes_read <= 0) {
-            return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
-        }
 
+
+        do {
+
+        num_bytes_read = tcp_read(client_fd, rcvbuf + read_bytes,
+                                  max_buff_sz - read_bytes - 1);
+
+        if (num_bytes_read < 0) {
+            free(rcvbuf);
+            return &our_ERR_IO;
+        }
         read_bytes += num_bytes_read;
         rcvbuf[read_bytes] = '\0'; // null terminate string for safety
         header_end = strstr(rcvbuf, HTTP_HDR_END_DELIM); // "\r\n\r\n"
 
-        parse_result = http_parse_message(rcvbuf, read_bytes, &message, &content_len);
-        if (parse_result < 0) {
-            return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
+
+            parse_result = http_parse_message(rcvbuf, read_bytes, &message, &content_len);
+            if (parse_result < 0) {
+                free(rcvbuf);
+                return &our_ERR_IO;
+            }
+
+            if (parse_result == 0 && content_len > 0 && read_bytes < content_len) {
+                max_buff_sz = MAX_HEADER_SIZE + content_len; // ZAC 27.05: update max_buffer_size
+                char *new_buf = realloc(rcvbuf, max_buff_sz); // ZAC 27.05: use max_buffer_size for realloc
+                if (!new_buf) {
+                    free(rcvbuf);
+                    return &our_ERR_IO;
+                }
+
+                rcvbuf = new_buf;
+                extended = 1;
+            }
+        } while (parse_result == 0 && read_bytes < max_buff_sz); // NEW VERSION: use parse_result and max_buffer_size
+
+        if (parse_result > 0) { // ZAC 27.05: process the fully parsed message
+            if (cb) {
+                int callback_result = cb(&message, client_fd); // NEW VERSION: handle callback result
+                if (callback_result < 0){
+                    free(rcvbuf);
+                    return &our_ERR_IO;
+                }
+
+
+            }
+
         }
+        read_bytes = 0;
+            content_len = 0;
+            extended = 0;
+            memset(rcvbuf,0,max_buff_sz);
 
-        if (parse_result == 0 && content_len > 0 && read_bytes < MAX_HEADER_SIZE + content_len) {
-            max_buff_sz = MAX_HEADER_SIZE + content_len; // ZAC 27.05: update max_buffer_size
-            char *new_buf = realloc(rcvbuf, max_buff_sz); // ZAC 27.05: use max_buffer_size for realloc
-            if (!new_buf)
-                return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
+    } while( num_bytes_read != 0);
 
-            rcvbuf = new_buf;
-            extended = 1;
-        }
-    } while (parse_result == 0 && read_bytes < max_buff_sz); // NEW VERSION: use parse_result and max_buffer_size
-
-    if (parse_result > 0) { // ZAC 27.05: process the fully parsed message
-        if (cb) {
-            int callback_result = cb(&message, client_fd); // NEW VERSION: handle callback result
-            if (callback_result < 0)
-                return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
-        }
-    } else return safe_free(client_fd, arg, rcvbuf, &our_ERR_IO);
-
-    return safe_free(client_fd, arg, rcvbuf, &our_ERR_NONE);
+    //free(rcvbuf);
+    close(client_fd);
+    free(arg);
+    return &our_ERR_NONE;
 }
 
 
