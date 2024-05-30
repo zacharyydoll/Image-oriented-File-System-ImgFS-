@@ -39,8 +39,6 @@ int do_delete(const char *img_id, struct imgfs_file *imgfs_file)
         return ERR_IO;
     }
 
-    fflush(imgfs_file->file);
-
     //Updating header information
     imgfs_file->header.nb_files--;
     imgfs_file->header.version++;
@@ -50,11 +48,10 @@ int do_delete(const char *img_id, struct imgfs_file *imgfs_file)
     if (fwrite(&imgfs_file->header, sizeof(struct imgfs_header), 1, imgfs_file->file) != 1) {
         return ERR_IO;
     }
-    fflush(imgfs_file->file);
 
+    //Recommended to insure metadata to disk without delay
+    fflush(imgfs_file->file);
 
     return ERR_NONE;
 
 }
-
-

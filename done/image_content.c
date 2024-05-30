@@ -12,12 +12,13 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
     if (resolution != THUMB_RES && resolution != SMALL_RES && resolution != ORIG_RES) {
         return ERR_INVALID_ARGUMENT; // Return appropriate error value
     }
+
     //ImgID validity check
     if (index > imgfs_file->header.nb_files) {
         return ERR_INVALID_IMGID;
     }
-    //Image already in the wanted resolution, no need to resize
 
+    //Image already in the wanted resolution, no need to resize
     if (imgfs_file->metadata[index].offset[resolution] != 0) {
         return ERR_NONE;
     }

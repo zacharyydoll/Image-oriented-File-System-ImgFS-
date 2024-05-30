@@ -29,7 +29,6 @@ int do_insert(const char *image_buffer, size_t image_size,
             free_idx = i;
             break;
         }
-
     }
 
     if(free_idx == -1) return ERR_IMGFS_FULL;

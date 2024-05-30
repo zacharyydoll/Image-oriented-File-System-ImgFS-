@@ -29,14 +29,14 @@ int do_read(const char *img_id, int resolution, char **image_buffer,
 
 
     //if image does not already exist in requested resolution, we call lazily_resize (if not original resolution)
-    if (imgfs_file->metadata[imgID_idx].offset[resolution] == 0 ||imgfs_file->metadata[imgID_idx].size[resolution] == 0) {
+    if (imgfs_file->metadata[imgID_idx].offset[resolution] == 0 ||imgfs_file->metadata[imgID_idx].size[resolution]== 0){
 
         if(resolution != ORIG_RES) {
+            //Resizing img if not in original resolution
             int ret_resize = lazily_resize(resolution, imgfs_file, imgID_idx);
             if (ret_resize != ERR_NONE) {
                 return ret_resize;
             }
-
         }
     }
 

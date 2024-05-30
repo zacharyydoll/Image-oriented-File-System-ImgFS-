@@ -22,12 +22,33 @@ static const uint16_t default_small_res = 256;
 static const uint16_t MAX_THUMB_RES = 128;
 static const uint16_t MAX_SMALL_RES = 512;
 
+/**
+ * @description Creates new file's name based on img id and resolution.
+ * @param img_id A pointer to the unique id of the image.
+ * @param resolution The resolution of the image for which the name is to be created.
+ * @param new_name Address of a character pointer where the new name of the image would be stored
+ */
 static void create_name(const char* img_id, int resolution, char** new_name);
+/**
+ * @description Write a disk image's buffer to a specified file.
+ * @param filename A pointer the name of the file to which the image buffer is to be written.
+ * @param image_buffer A pointer the buffer data of the disk image.
+ * @param image_size The size of the image_buffer in bytes.
+ * @returns Integer value indicating the status of the write operation : 0 if everything works fine
+ */
 static int write_disk_image(const char *filename, const char *image_buffer, uint32_t image_size);
+
+/**
+ * @description Reads disk image data from a specified file into a buffer.
+ * @param path A pointer to the path of the file from which the image data is to be read.
+ * @param image_buffer Address of the buffer where the read image data would be stored.
+ * @param image_size Pointer where the size of the image data read would be stored.
+ * @returns Integer value indicating the status of the read operation : 0 if everything works fine
+ */
 static int read_disk_image(const char *path, char **image_buffer, uint32_t *image_size);
 
 /**********************************************************************
- * Displays some explanations.
+ * Displays some explanations -> Updated in week 10
  ********************************************************************** */
 int help(int useless _unused, char **useless_too _unused)
 {
@@ -81,9 +102,6 @@ int do_list_cmd(int argc, char **argv)
     if (open_ret != ERR_NONE) return open_ret;
 
     //Displaying the content of the imgFS file
-    // WEEK 13 Modifications
-    //char *json_op = NULL;
-    //int list_ret = do_list(&imgfsFile, JSON, &json_op);
     int list_ret = do_list(&imgfsFile, STDOUT, NULL);
 
     if (list_ret != ERR_NONE) {
@@ -142,7 +160,7 @@ int do_create_cmd(int argc, char **argv)
     for (int i = 1; i < argc; ++i) {
         char *curr = argv[i]; // Current (optional) argument
 
-        if (strcmp(curr, "-max_files") == 0 ) {//checks that we have at least one parameter
+        if (strcmp(curr, "-max_files") == 0 ) { //checks that we have at least one parameter
             if (i + 1 >= argc) {
                 return ERR_NOT_ENOUGH_ARGUMENTS;
             }
@@ -261,6 +279,7 @@ int do_read_cmd(int argc, char **argv)
     struct imgfs_file myfile;
     zero_init_var(myfile);
     int error = do_open(argv[0], "rb+", &myfile);
+
     if (error != ERR_NONE) return error;
 
     char *image_buffer = NULL;
@@ -292,9 +311,9 @@ int do_insert_cmd(int argc, char **argv)
     M_REQUIRE_NON_NULL(argv);
     if (argc != 3) return ERR_NOT_ENOUGH_ARGUMENTS;
 
-    struct imgfs_file myfile;
-    zero_init_var(myfile);
-    int error = do_open(argv[0], "rb+", &myfile);
+    struct imgfs_file imgfsFile;
+    zero_init_var(imgfsFile);
+    int error = do_open(argv[0], "rb+", &imgfsFile);
     if (error != ERR_NONE) return error;
 
     char *image_buffer = NULL;
@@ -303,13 +322,13 @@ int do_insert_cmd(int argc, char **argv)
     // Reads image from the disk.
     error = read_disk_image (argv[2], &image_buffer, &image_size);
     if (error != ERR_NONE) {
-        do_close(&myfile);
+        do_close(&imgfsFile);
         return error;
     }
 
-    error = do_insert(image_buffer, image_size, argv[1], &myfile);
+    error = do_insert(image_buffer, image_size, argv[1], &imgfsFile);
     free(image_buffer);
-    do_close(&myfile);
+    do_close(&imgfsFile);
     return error;
 }
 
@@ -346,7 +365,7 @@ static void create_name(const char* img_id, int resolution, char** new_name) {
 
 /**********************************************************************
  * Write the content of a buffer of size provided, to a file of name provided.
- * TODO : DOCUMENTATION
+
  */
 static int write_disk_image(const char *filename, const char *image_buffer, uint32_t image_size) {
 
@@ -357,6 +376,7 @@ static int write_disk_image(const char *filename, const char *image_buffer, uint
     FILE *file = fopen(filename, "wb");
     if (file == NULL) return ERR_IO; // Checking if file opening failed
 
+    //Writing images to disk
     size_t written_bytes = fwrite(image_buffer, sizeof(char), image_size, file);
 
     fclose(file);
@@ -373,7 +393,7 @@ static int write_disk_image(const char *filename, const char *image_buffer, uint
 
 /**********************************************************************
  * Read content of file to buffer.
- * TODO : DOCUMENTATION
+
  */
 static int read_disk_image(const char *path, char **image_buffer, uint32_t *image_size) {
 

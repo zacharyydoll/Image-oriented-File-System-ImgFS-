@@ -85,7 +85,6 @@ static void *handle_connection(void *arg) {
 
     do {
 
-
         do {
 
         num_bytes_read = tcp_read(client_fd, rcvbuf + read_bytes,

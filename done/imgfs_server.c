@@ -48,12 +48,14 @@ int main (int argc, char *argv[]) {
 
     set_signal_handler();
     int err = server_startup(argc, argv);
+
     if (err < 0) {
         fprintf(stderr, "http_init() failed\n");
         fprintf(stderr, "%s\n", ERR_MSG(err));
         server_shutdown();
         return err;
     }
+
 
     //loop on http_receive() as long as there are no error
     while ((err = http_receive()) == ERR_NONE);

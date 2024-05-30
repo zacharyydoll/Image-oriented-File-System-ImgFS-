@@ -11,12 +11,13 @@
  *
  */
 int http_match_uri(const struct http_message *message, const char *target_uri) {
+
+    //Argument validity check
     M_REQUIRE_NON_NULL(message);
     M_REQUIRE_NON_NULL(target_uri);
 
-    if (message->uri.len < strlen(target_uri)) {
-        return 0;
-    }
+    if (message->uri.len < strlen(target_uri)) return 0;
+
 
     for (size_t i = 0; i < strlen(target_uri); ++i) {
         if (message->uri.val[i] != target_uri[i]) {
@@ -30,13 +31,12 @@ int http_match_uri(const struct http_message *message, const char *target_uri) {
 
 
 int http_match_verb(const struct http_string *method, const char *verb) {
+    //Argument validity check
     M_REQUIRE_NON_NULL(method);
     M_REQUIRE_NON_NULL(verb);
 
     size_t verb_length = strlen(verb);
-    if (method->len != verb_length) {
-        return 0;
-    }
+    if (method->len != verb_length) { return 0; }
 
     for (size_t i = 0; i < verb_length; ++i) {
         if (method->val[i] != verb[i]) {
@@ -48,15 +48,17 @@ int http_match_verb(const struct http_string *method, const char *verb) {
 }
 
 int http_get_var(const struct http_string *url, const char *name, char *out, size_t out_len) {
-
+    //Argument validity check
     M_REQUIRE_NON_NULL(url);
     M_REQUIRE_NON_NULL(name);
     M_REQUIRE_NON_NULL(out);
+
     if (out_len <= 0) return ERR_INVALID_ARGUMENT;
 
-    //copy name into new string and append "=" (and null terminator)
+    //Copy of name into new string and append "=" (and null terminator)
     size_t name_length = strlen(name);
-    char *param_eq = (char *) malloc(name_length + 2); // 1 for "=" and 1 for the nul terminator ('\0')!!
+
+    char *param_eq = (char *) calloc(1,name_length + 2); // 1 for "=" and 1 for the nul terminator ('\0')
     if (!param_eq) {
         return ERR_OUT_OF_MEMORY;
     }
@@ -67,6 +69,7 @@ int http_get_var(const struct http_string *url, const char *name, char *out, siz
     char *start = strstr(url->val, param_eq);
     if (!start) {
         free(param_eq);
+        param_eq = NULL;
         return 0; // parameter not found in URL -> return 0 (handout)
     }
 
@@ -79,6 +82,7 @@ int http_get_var(const struct http_string *url, const char *name, char *out, siz
     size_t value_length = end - start;
     if (value_length >= out_len) {
         free(param_eq);
+        param_eq = NULL;
         return ERR_RUNTIME;
     }
 
@@ -86,6 +90,7 @@ int http_get_var(const struct http_string *url, const char *name, char *out, siz
     out[value_length] = '\0';
 
     free(param_eq);
+    param_eq = NULL;
     return value_length;
 }
 
@@ -98,7 +103,9 @@ int http_get_var(const struct http_string *url, const char *name, char *out, siz
  */
 
 const char *get_next_token(const char *message, const char *delimiter, struct http_string *output) {
+
     const char *delim_pos = strstr(message, delimiter);
+
     if (delim_pos) {
         output->val = message;
         output->len = delim_pos - message;
@@ -115,6 +122,7 @@ const char *get_next_token(const char *message, const char *delimiter, struct ht
  * @brief: Fill all headers key-value pairs of output
  */
 const char *http_parse_headers(const char *header_start, struct http_message *output) {
+
     const char *current = header_start;
     struct http_string key, value;
     size_t idx = 0;
@@ -145,32 +153,33 @@ const char *http_parse_headers(const char *header_start, struct http_message *ou
  * @see {http_prot.h#http_parse_message}
  */
 int http_parse_message(const char *stream, size_t bytes_received, struct http_message *out, int *content_len) {
+
+    //Argument validity check
     M_REQUIRE_NON_NULL(stream);
     M_REQUIRE_NON_NULL(out);
     M_REQUIRE_NON_NULL(content_len);
 
-    // check that header has been completely received
+    // Check that header has been completely received
     const char *header_end = strstr(stream, HTTP_HDR_END_DELIM);
     if (!header_end) {
         return 0;  // headers incomplete
     }
 
-    //CHANGE_SARA : added parsing the first line  (see handout )
     const char *current = stream;
     current = get_next_token(current, " ", &out->method);
     current = get_next_token(current, " ", &out->uri);
+
     struct http_string http_version;
     current = get_next_token(current, HTTP_LINE_DELIM, &http_version);
 
 
 
     // Parse headers
-    current = http_parse_headers(current, out);
+    http_parse_headers(current, out);
 
     if (out->num_headers == 0) {
         return 0;  // no headers parsed
     }
-
 
     // extract content length from headers
     *content_len = 0;
@@ -181,14 +190,13 @@ int http_parse_message(const char *stream, size_t bytes_received, struct http_me
         }
     }
 
-    //CHANGE_SARA : condition update
     size_t header_length = header_end + strlen(HTTP_HDR_END_DELIM) - stream;
     size_t total_length = header_length + *content_len;
     if (*content_len > 0 && bytes_received < total_length) {
         return 0; // Message is incomplete (body not fully received)
     }
 
-    // handle body (if any)
+    // Dandling body (if any)
     if (*content_len > 0) {
         if (bytes_received < total_length){
             out->body.val = NULL;
@@ -199,15 +207,7 @@ int http_parse_message(const char *stream, size_t bytes_received, struct http_me
             out->body.len = *content_len;
         }
 
-
     }
 
     return 1;  // msg fully received and parsed w/o a body
 }
-
-//==================================================================================================================
-//==================================================================================================================
-//==================================================================================================================
-
-
-

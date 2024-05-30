@@ -2,6 +2,7 @@
 #include <string.h> // for strncpy
 #include <stdlib.h> // for calloc
 
+
 int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file)
 {
     // Parameter validity check
@@ -34,6 +35,7 @@ int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file)
     if (fwrite(&(imgfs_file->header), sizeof(struct imgfs_header), 1, imgfs_file->file) != 1) {
         fclose(imgfs_file->file);
         free(imgfs_file->metadata); // Free the memory allocated before returning
+        imgfs_file->metadata = NULL;
         return ERR_IO;
     }
     // Handling write errors in the metadata
@@ -44,6 +46,7 @@ int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file)
 
         fclose(imgfs_file->file);
         free(imgfs_file->metadata);
+        imgfs_file->metadata = NULL;
         return ERR_IO;
     }
     // print # of items written
