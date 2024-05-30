@@ -43,7 +43,7 @@ In Multiple files:
 Helper function to better handle cleanup of pointers (see code documentation for required arguments and information).
 
 In `tcp-test-client.c`:
--`send_file`
+- `send_file`
 
 Helper function for cleaner code that sends a file to a server 
 
