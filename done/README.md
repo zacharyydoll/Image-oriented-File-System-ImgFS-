@@ -37,14 +37,24 @@ In `http_prot.c`:
 
 Both of which help `http_parse_message`parse an HTTP message (see code documentation for more information). 
 
-In `http_net.c`:
+In Multiple files:
 - `safe_free`
 
-Helper function to better handle cleanup and return the appropriate error codes in `handle_connection` (see code documentation for required arguments and information).
+Helper function to better handle cleanup of pointers (see code documentation for required arguments and information).
+
+In `tcp-test-client.c`:
+-`send_file`
+
+Helper function for cleaner code that sends a file to a server 
+
+In `tcp-test-server.c`:
+- `receive_file`
+
+Helper function for cleaner code that receives a file over a TCP connection
 
 ### General information
 
-- All steps of the project were fully completed. 
+- All steps of the project were fully completed and tested on a localhost webserver. 
 - Other than the aforementioned helper-functions, the code conception rigorously followed the provided handout.
 - Was very fun overall :)
 

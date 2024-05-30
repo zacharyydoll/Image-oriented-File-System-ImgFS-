@@ -3,14 +3,26 @@
 #include <stdlib.h> // for malloc
 #include "error.h"
 
-
+/**
+ * @brief Helper function to safely free pointers.
+ *
+ * @param ptr The pointer to free
+ */
+void safe_free(void* ptr)
+{
+    if (ptr != NULL ) {
+        free(ptr);
+        ptr = NULL;
+    }
+}
 /**
  * @brief Checks whether the `message` URI starts with the provided `target_uri`.
  *
  * Returns: 1 if it does, 0 if it does not.
  *
  */
-int http_match_uri(const struct http_message *message, const char *target_uri) {
+int http_match_uri(const struct http_message *message, const char *target_uri)
+{
 
     //Argument validity check
     M_REQUIRE_NON_NULL(message);
@@ -30,13 +42,16 @@ int http_match_uri(const struct http_message *message, const char *target_uri) {
 }
 
 
-int http_match_verb(const struct http_string *method, const char *verb) {
+int http_match_verb(const struct http_string *method, const char *verb)
+{
     //Argument validity check
     M_REQUIRE_NON_NULL(method);
     M_REQUIRE_NON_NULL(verb);
 
     size_t verb_length = strlen(verb);
-    if (method->len != verb_length) { return 0; }
+    if (method->len != verb_length) {
+        return 0;
+    }
 
     for (size_t i = 0; i < verb_length; ++i) {
         if (method->val[i] != verb[i]) {
@@ -47,7 +62,8 @@ int http_match_verb(const struct http_string *method, const char *verb) {
     return 1;
 }
 
-int http_get_var(const struct http_string *url, const char *name, char *out, size_t out_len) {
+int http_get_var(const struct http_string *url, const char *name, char *out, size_t out_len)
+{
     //Argument validity check
     M_REQUIRE_NON_NULL(url);
     M_REQUIRE_NON_NULL(name);
@@ -68,8 +84,7 @@ int http_get_var(const struct http_string *url, const char *name, char *out, siz
     //find parameter position in URL
     char *start = strstr(url->val, param_eq);
     if (!start) {
-        free(param_eq);
-        param_eq = NULL;
+        safe_free(param_eq);
         return 0; // parameter not found in URL -> return 0 (handout)
     }
 
@@ -81,16 +96,14 @@ int http_get_var(const struct http_string *url, const char *name, char *out, siz
 
     size_t value_length = end - start;
     if (value_length >= out_len) {
-        free(param_eq);
-        param_eq = NULL;
+        safe_free(param_eq);
         return ERR_RUNTIME;
     }
 
     strncpy(out, start, value_length);
     out[value_length] = '\0';
 
-    free(param_eq);
-    param_eq = NULL;
+    safe_free(param_eq);
     return value_length;
 }
 
@@ -102,7 +115,8 @@ int http_get_var(const struct http_string *url, const char *name, char *out, siz
  * @brief: Extract the first substring (prefix) of a the string before some delimiter
  */
 
-const char *get_next_token(const char *message, const char *delimiter, struct http_string *output) {
+const char *get_next_token(const char *message, const char *delimiter, struct http_string *output)
+{
 
     const char *delim_pos = strstr(message, delimiter);
 
@@ -121,7 +135,8 @@ const char *get_next_token(const char *message, const char *delimiter, struct ht
 /**
  * @brief: Fill all headers key-value pairs of output
  */
-const char *http_parse_headers(const char *header_start, struct http_message *output) {
+const char *http_parse_headers(const char *header_start, struct http_message *output)
+{
 
     const char *current = header_start;
     struct http_string key, value;
@@ -146,13 +161,14 @@ const char *http_parse_headers(const char *header_start, struct http_message *ou
     output->num_headers = idx;
 
     // return position right after end of the last header line.
-    return current; //+ strlen(HTTP_LINE_DELIM);
+    return current;
 }
 
 /**
  * @see {http_prot.h#http_parse_message}
  */
-int http_parse_message(const char *stream, size_t bytes_received, struct http_message *out, int *content_len) {
+int http_parse_message(const char *stream, size_t bytes_received, struct http_message *out, int *content_len)
+{
 
     //Argument validity check
     M_REQUIRE_NON_NULL(stream);
@@ -198,16 +214,14 @@ int http_parse_message(const char *stream, size_t bytes_received, struct http_me
 
     // Dandling body (if any)
     if (*content_len > 0) {
-        if (bytes_received < total_length){
+        if (bytes_received < total_length) {
             out->body.val = NULL;
             out->body.len = 0;  //incomplete body
             return 0;
-        }else{
+        } else {
             out->body.val = header_end + strlen(HTTP_HDR_END_DELIM);
             out->body.len = *content_len;
         }
-
     }
-
     return 1;  // msg fully received and parsed w/o a body
 }

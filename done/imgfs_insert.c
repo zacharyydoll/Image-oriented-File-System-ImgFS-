@@ -5,7 +5,8 @@
 
 
 int do_insert(const char *image_buffer, size_t image_size,
-              const char *img_id, struct imgfs_file *imgfs_file) {
+              const char *img_id, struct imgfs_file *imgfs_file)
+{
 
     //Arguments validity check
     M_REQUIRE_NON_NULL(img_id);
@@ -13,7 +14,7 @@ int do_insert(const char *image_buffer, size_t image_size,
     M_REQUIRE_NON_NULL(imgfs_file);
 
     //Image size validity check
-    if (image_size == 0){
+    if (image_size == 0) {
         return ERR_INVALID_ARGUMENT;
     }
 
@@ -61,7 +62,7 @@ int do_insert(const char *image_buffer, size_t image_size,
     //If no duplicates were found, we write the image to the end of the file
     if(imgfs_file->metadata[free_idx].offset[ORIG_RES] == 0) {
 
-        if (fseek(imgfs_file->file, 0, SEEK_END) != 0){
+        if (fseek(imgfs_file->file, 0, SEEK_END) != 0) {
             return ERR_IO;
         }
 

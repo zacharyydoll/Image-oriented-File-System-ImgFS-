@@ -2,6 +2,18 @@
 #include <string.h> // for strncpy
 #include <stdlib.h> // for calloc
 
+/**
+ * @brief Helper function to safely free pointers.
+ *
+ * @param ptr The pointer to free
+ */
+void safe_free(void* ptr)
+{
+    if (ptr != NULL ) {
+        free(ptr);
+        ptr = NULL;
+    }
+}
 
 int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file)
 {
@@ -27,15 +39,14 @@ int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file)
     // Initializing all bytes of metadata to 0
     imgfs_file->metadata = calloc(imgfs_file->header.max_files, sizeof(struct img_metadata));
     if (imgfs_file->metadata == NULL) {
-        fclose(imgfs_file->file);
+        do_close(imgfs_file);
         return ERR_OUT_OF_MEMORY;
     }
 
     // Handling writing errors in the header
     if (fwrite(&(imgfs_file->header), sizeof(struct imgfs_header), 1, imgfs_file->file) != 1) {
-        fclose(imgfs_file->file);
-        free(imgfs_file->metadata); // Free the memory allocated before returning
-        imgfs_file->metadata = NULL;
+        safe_free(imgfs_file->metadata);
+        do_close(imgfs_file);
         return ERR_IO;
     }
     // Handling write errors in the metadata
@@ -44,8 +55,8 @@ int do_create(const char *imgfs_filename, struct imgfs_file *imgfs_file)
                imgfs_file->header.max_files,
                imgfs_file->file) != imgfs_file->header.max_files) {
 
-        fclose(imgfs_file->file);
-        free(imgfs_file->metadata);
+        safe_free(imgfs_file->metadata);
+        do_close(imgfs_file);
         imgfs_file->metadata = NULL;
         return ERR_IO;
     }

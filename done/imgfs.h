@@ -216,7 +216,7 @@ int do_gbcollect(const char *imgfs_path, const char *imgfs_tmp_bkp_path);
  *
  * @param ptr The pointer to be freed.
  */
-void safe_free(void** ptr);
+
 
 #ifdef __cplusplus
 }

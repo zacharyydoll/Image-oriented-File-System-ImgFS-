@@ -1,4 +1,4 @@
-/* 
+/*
  * @file imgfs_server_services.c
  * @brief ImgFS server part, bridge between HTTP server layer and ImgFS library
  *
@@ -27,7 +27,8 @@ pthread_mutex_t thread;
 /**********************************************************************
  * Sends error message.
  ********************************************************************** */
-static int reply_error_msg(int connection, int error) {
+static int reply_error_msg(int connection, int error)
+{
 #define ERR_MSG_SIZE 256
     char err_msg[ERR_MSG_SIZE]; // enough for any reasonable err_msg
     if (snprintf(err_msg, ERR_MSG_SIZE, "Error: %s\n", ERR_MSG(error)) < 0) {
@@ -42,7 +43,8 @@ static int reply_error_msg(int connection, int error) {
 /**********************************************************************
  * Sends 302 OK message.
  ********************************************************************** */
-static int reply_302_msg(int connection) {
+static int reply_302_msg(int connection)
+{
     char location[ERR_MSG_SIZE];
     if (snprintf(location, ERR_MSG_SIZE, "Location: http://localhost:%d/" BASE_FILE HTTP_LINE_DELIM,
                  server_port) < 0) {
@@ -55,7 +57,8 @@ static int reply_302_msg(int connection) {
  * Locks the mutex thread
  * @return ERR_RUNTIME if error and ERR_NONE if not
  */
-int thread_lock(){
+int thread_lock()
+{
 
     if (pthread_mutex_lock(&thread) != 0) {
         perror("pthread_mutex_lock failed");
@@ -67,7 +70,8 @@ int thread_lock(){
  * Unlocks the mutex thread
  * @return ERR_RUNTIME if error and ERR_NONE if not
  */
-int thread_unlock(){
+int thread_unlock()
+{
     if (pthread_mutex_unlock(&thread) != 0) {
         perror("pthread_mutex_unlock failed");
         return ERR_RUNTIME;
@@ -75,7 +79,8 @@ int thread_unlock(){
     return ERR_NONE;
 }
 
-int handle_list_call(int connection) {
+int handle_list_call(int connection)
+{
 
     char *json_op = NULL;
 
@@ -105,7 +110,8 @@ int handle_list_call(int connection) {
 }
 
 
-int handle_read_call(int connection, const struct http_message* msg) {
+int handle_read_call(int connection, const struct http_message* msg)
+{
 
     M_REQUIRE_NON_NULL(msg);
 
@@ -152,7 +158,8 @@ int handle_read_call(int connection, const struct http_message* msg) {
 }
 
 
-int handle_delete_call(int connection, const struct http_message* msg) {
+int handle_delete_call(int connection, const struct http_message* msg)
+{
 
     M_REQUIRE_NON_NULL(msg);
 
@@ -178,7 +185,8 @@ int handle_delete_call(int connection, const struct http_message* msg) {
     return reply_302_msg(connection);
 }
 
-int handle_insert_call(int connection, const struct http_message* msg) {
+int handle_insert_call(int connection, const struct http_message* msg)
+{
 
     M_REQUIRE_NON_NULL(msg);
 
@@ -213,7 +221,8 @@ int handle_insert_call(int connection, const struct http_message* msg) {
 /**********************************************************************
  * Simple handling of http message. TO BE UPDATED WEEK 13
  ********************************************************************** */
-int handle_http_message(struct http_message* msg, int connection) {
+int handle_http_message(struct http_message* msg, int connection)
+{
 
     M_REQUIRE_NON_NULL(msg);
     debug_printf("handle_http_message() on connection %d. URI: %.*s\n",
@@ -249,7 +258,8 @@ int handle_http_message(struct http_message* msg, int connection) {
  * Startup function. Create imgFS file and load in-memory structure.
  * Pass the imgFS file name as argv[1] and optionally port number as argv[2]
  ********************************************************************** */
-int server_startup (int argc, char **argv) {
+int server_startup (int argc, char **argv)
+{
 
     //Argument validity check
     M_REQUIRE_NON_NULL(argv);
@@ -285,7 +295,8 @@ int server_startup (int argc, char **argv) {
 /********************************************************************//**
  * Shutdown function. Free the structures and close the file.
  ********************************************************************** */
-void server_shutdown (void) {
+void server_shutdown (void)
+{
 
     fprintf(stderr, "Shutting down...\n");
     http_close();

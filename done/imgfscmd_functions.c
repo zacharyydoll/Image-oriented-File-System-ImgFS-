@@ -47,6 +47,19 @@ static int write_disk_image(const char *filename, const char *image_buffer, uint
  */
 static int read_disk_image(const char *path, char **image_buffer, uint32_t *image_size);
 
+/**
+ * @brief Helper function to safely free pointers.
+ *
+ * @param ptr The pointer to free
+ */
+void safe_free(void* ptr)
+{
+    if (ptr != NULL ) {
+        free(ptr);
+        ptr = NULL;
+    }
+}
+
 /**********************************************************************
  * Displays some explanations -> Updated in week 10
  ********************************************************************** */
@@ -201,13 +214,20 @@ int do_create_cmd(int argc, char **argv)
             .max_files = max_files,
             .resized_res = {thumb_x_res, thumb_y_res, small_x_res, small_y_res}
         }
+
     };
+
+    imgfsFile.metadata = NULL;
+    imgfsFile.file = NULL;
 
     do_create(imgfs_filename, &imgfsFile);
 
     // After the imgFS file is created, for cleanup, the file is closed and the metadata is freed
-    fclose(imgfsFile.file);
-    free(imgfsFile.metadata);
+    if (imgfsFile.file != NULL) {
+        do_close(&imgfsFile);
+        imgfsFile.file = NULL;
+    }
+
 
     //Everything went well
     return ERR_NONE;
@@ -218,7 +238,6 @@ int do_create_cmd(int argc, char **argv)
  */
 int do_delete_cmd(int argc, char **argv)
 {
-
     //Argument validity check
     M_REQUIRE_NON_NULL(argv);
 
@@ -296,8 +315,8 @@ int do_read_cmd(int argc, char **argv)
     create_name(img_id, resolution, &tmp_name);
     if (tmp_name == NULL) return ERR_OUT_OF_MEMORY;
     error = write_disk_image(tmp_name, image_buffer, image_size);
-    free(tmp_name);
-    free(image_buffer);
+    safe_free(tmp_name);
+    safe_free(image_buffer);
 
     return error;
 }
@@ -327,7 +346,7 @@ int do_insert_cmd(int argc, char **argv)
     }
 
     error = do_insert(image_buffer, image_size, argv[1], &imgfsFile);
-    free(image_buffer);
+    safe_free(image_buffer);
     do_close(&imgfsFile);
     return error;
 }
@@ -335,22 +354,23 @@ int do_insert_cmd(int argc, char **argv)
 /**********************************************************************
  * Create a new name for the image file.
  */
-static void create_name(const char* img_id, int resolution, char** new_name) {
+static void create_name(const char* img_id, int resolution, char** new_name)
+{
 
     const char* resolution_str = NULL;
 
     switch (resolution) {
-        case ORIG_RES:
-            resolution_str = "_orig";
-            break;
-        case THUMB_RES:
-            resolution_str = "_thumb";
-            break;
-        case SMALL_RES:
-            resolution_str = "_small";
-            break;
-        default:
-            resolution_str = "_unknownResolution";
+    case ORIG_RES:
+        resolution_str = "_orig";
+        break;
+    case THUMB_RES:
+        resolution_str = "_thumb";
+        break;
+    case SMALL_RES:
+        resolution_str = "_small";
+        break;
+    default:
+        resolution_str = "_unknownResolution";
     }
 
     //Allocating memory for : image_id + resolution_suffix + '.jpg' + '\0'
@@ -367,7 +387,8 @@ static void create_name(const char* img_id, int resolution, char** new_name) {
  * Write the content of a buffer of size provided, to a file of name provided.
 
  */
-static int write_disk_image(const char *filename, const char *image_buffer, uint32_t image_size) {
+static int write_disk_image(const char *filename, const char *image_buffer, uint32_t image_size)
+{
 
     //Arguments validity check
     M_REQUIRE_NON_NULL(filename);
@@ -395,7 +416,8 @@ static int write_disk_image(const char *filename, const char *image_buffer, uint
  * Read content of file to buffer.
 
  */
-static int read_disk_image(const char *path, char **image_buffer, uint32_t *image_size) {
+static int read_disk_image(const char *path, char **image_buffer, uint32_t *image_size)
+{
 
     //Argument validity check
     M_REQUIRE_NON_NULL(path);
@@ -414,7 +436,7 @@ static int read_disk_image(const char *path, char **image_buffer, uint32_t *imag
     fseek(file, 0, SEEK_SET);
 
     //Allocating memory for image
-    *image_buffer = (char *)malloc(*image_size);
+    *image_buffer = (char *)calloc(1,*image_size);
     if (!(*image_buffer)) {
         fclose(file);
         return ERR_OUT_OF_MEMORY;
@@ -424,7 +446,7 @@ static int read_disk_image(const char *path, char **image_buffer, uint32_t *imag
     fclose(file);
 
     if (read != *image_size) {
-        free(*image_buffer);
+        safe_free(*image_buffer);
         return ERR_IO;
     }
 

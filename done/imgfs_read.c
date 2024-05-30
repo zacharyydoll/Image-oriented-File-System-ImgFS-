@@ -4,7 +4,8 @@
 #include <stdlib.h>
 
 int do_read(const char *img_id, int resolution, char **image_buffer,
-            uint32_t *image_size, struct imgfs_file *imgfs_file) {
+            uint32_t *image_size, struct imgfs_file *imgfs_file)
+{
 
     //Arguments validity check
     M_REQUIRE_NON_NULL(img_id);
@@ -20,16 +21,13 @@ int do_read(const char *img_id, int resolution, char **image_buffer,
         }
     }
 
-
     //Case where no corresponding imgID was found in metadata table
     if(imgID_idx == imgfs_file->header.max_files) {
         return ERR_IMAGE_NOT_FOUND;
     }
 
-
-
     //if image does not already exist in requested resolution, we call lazily_resize (if not original resolution)
-    if (imgfs_file->metadata[imgID_idx].offset[resolution] == 0 ||imgfs_file->metadata[imgID_idx].size[resolution]== 0){
+    if (imgfs_file->metadata[imgID_idx].offset[resolution] == 0 ||imgfs_file->metadata[imgID_idx].size[resolution]== 0) {
 
         if(resolution != ORIG_RES) {
             //Resizing img if not in original resolution

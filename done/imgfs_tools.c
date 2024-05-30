@@ -105,7 +105,8 @@ ORIGINAL: %"
 /*******************************************************************
  * Resolution string to resolution enum.
  */
-int resolution_atoi (const char* str) {
+int resolution_atoi (const char* str)
+{
     if (str == NULL) return -1;
 
     if (!strcmp(str, "thumb") || !strcmp(str, "thumbnail")) {
@@ -182,9 +183,3 @@ void do_close(struct imgfs_file *imgfs_file)
     } else return; // Nothing to close or free
 }
 
-void safe_free(void** ptr) {
-    if (ptr != NULL && *ptr != NULL) {
-        free(*ptr);
-        *ptr = NULL;
-    }
-}

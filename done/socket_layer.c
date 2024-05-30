@@ -14,14 +14,16 @@
  *
  * @return ERR_IO  A constant int that represents an I/O error.
  */
-int close_after_error(char* err_mess,int socket_tcp){
+int close_after_error(char* err_mess,int socket_tcp)
+{
     perror(err_mess);
     close(socket_tcp);
     return ERR_IO;
 }
 
 
-int tcp_server_init(uint16_t port){
+int tcp_server_init(uint16_t port)
+{
     int socket_tcp ;
     struct sockaddr_in server_addr;
 
@@ -29,7 +31,7 @@ int tcp_server_init(uint16_t port){
     memset(&server_addr, 0, sizeof(server_addr));
 
     socket_tcp = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-    if(socket_tcp<0){
+    if(socket_tcp<0) {
         close_after_error("Error creating socket",socket_tcp);
     }
 
@@ -55,16 +57,19 @@ int tcp_server_init(uint16_t port){
     return socket_tcp;
 }
 
-int tcp_accept(int passive_socket){
+int tcp_accept(int passive_socket)
+{
     return accept(passive_socket,NULL,NULL);
 }
 
-ssize_t tcp_read(int active_socket, char* buf, size_t buflen){
+ssize_t tcp_read(int active_socket, char* buf, size_t buflen)
+{
     M_REQUIRE_NON_NULL(buf);
     return recv(active_socket,buf,buflen,0);
 }
 
-ssize_t tcp_send(int active_socket, const char* response, size_t response_len){
+ssize_t tcp_send(int active_socket, const char* response, size_t response_len)
+{
     M_REQUIRE_NON_NULL(response);
     return send(active_socket,response,response_len,0);
 }

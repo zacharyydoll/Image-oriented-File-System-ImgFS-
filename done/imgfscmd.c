@@ -19,8 +19,6 @@
  * MAIN
  */
 
-
-
 //Typedef for command function pointer
 typedef int (*command)(int argc, char *argv[]);
 
@@ -52,9 +50,6 @@ int main(int argc, char *argv[])
     if (VIPS_INIT(argv[0])) {
         vips_error_exit("unable to start VIPS");
     }
-
-
-
 
     if (argc < 2) {
         return ERR_NOT_ENOUGH_ARGUMENTS;

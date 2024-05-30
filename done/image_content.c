@@ -4,7 +4,21 @@
 #include "image_content.h"
 #include <vips/vips.h>
 
-int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
+/**
+ * @brief Helper function to safely free pointers.
+ *
+ * @param ptr The pointer to free
+ */
+void safe_free(void* ptr)
+{
+    if (ptr != NULL ) {
+        free(ptr);
+        ptr = NULL;
+    }
+}
+
+int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index)
+{
     //File validity check
     M_REQUIRE_NON_NULL(imgfs_file);
 
@@ -55,14 +69,14 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
     // Seek to the offset of the image data within the file
     if (fseek(imgfs_file->file, (long)offset, SEEK_SET) != 0) {
         // Handle fseek failure
-        free(img_data);
+        safe_free(img_data);
         return ERR_IO;
     }
 
     size_t bytes_read = fread(img_data, 1, img_size, imgfs_file->file);
     if (bytes_read != imgfs_file->metadata[index].size[ORIG_RES]) {
         // Handle fread failure or incomplete read
-        free(img_data);
+        safe_free(img_data);
         return ERR_IO;
     }
 
@@ -77,7 +91,7 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
     if (vips_thumbnail_image(orig_image, &resized_image, (int)target_width, "height", target_height, NULL) != 0) {
         // Handle resizing failure
         g_object_unref(orig_image);
-        free(img_data);
+        safe_free(img_data);
         return ERR_IMGLIB;
     }
 
@@ -87,7 +101,8 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
         // Handle saving failure
         g_object_unref(orig_image);
         g_object_unref(resized_image);
-        free(img_data);
+        safe_free(img_data);
+        g_free(buffer);
         return ERR_IMGLIB;
     }
 
@@ -99,7 +114,7 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
         // Handle fwrite failure or incomplete write
         g_object_unref(orig_image);
         g_object_unref(resized_image);
-        free(img_data);
+        safe_free(img_data);
         g_free(buffer);
         return ERR_IO;
     }
@@ -119,7 +134,7 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
     if (fwrite(&imgfs_file->metadata[index], sizeof(struct img_metadata), 1, imgfs_file->file) !=1) {
         g_object_unref(orig_image);
         g_object_unref(resized_image);
-        free(img_data);
+        safe_free(img_data);
         g_free(buffer);
         return ERR_IO;
     }
@@ -128,7 +143,7 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
     // Cleanup
     g_object_unref(orig_image);
     g_object_unref(resized_image);
-    free(img_data);
+    safe_free(img_data);
     g_free(buffer);
     fflush(imgfs_file->file);
 
@@ -142,17 +157,18 @@ int lazily_resize(int resolution, struct imgfs_file* imgfs_file, size_t index) {
 //======================================================================================================================
 
 int get_resolution(uint32_t *height, uint32_t *width,
-                   const char *image_buffer, size_t image_size) {
+                   const char *image_buffer, size_t image_size)
+{
     M_REQUIRE_NON_NULL(height);
     M_REQUIRE_NON_NULL(width);
     M_REQUIRE_NON_NULL(image_buffer);
 
     VipsImage* original = NULL;
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wcast-qual"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-qual"
     const int err = vips_jpegload_buffer((void*) image_buffer, image_size,
                                          &original, NULL);
-    #pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
     if (err != ERR_NONE) return ERR_IMGLIB;
 
     *height = (uint32_t) vips_image_get_height(original);

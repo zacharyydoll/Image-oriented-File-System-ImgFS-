@@ -14,12 +14,6 @@ int do_name_and_content_dedup(struct imgfs_file *imgfs_file, uint32_t index)
     // Getting metadata of the target image
     struct img_metadata *targetImg = &imgfs_file->metadata[index];
 
-    /*
-    if (targetImg->is_valid == EMPTY) {
-        printf("\nhere in dedup 2\n");
-        return ERR_IMAGE_NOT_FOUND; //if image is invalid, return out of bounds (see tests)
-    }
-     */
 
     for (uint32_t i = 0; i < imgfs_file->header.nb_files; ++i) {
 
