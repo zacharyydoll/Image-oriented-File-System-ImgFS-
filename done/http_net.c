@@ -16,7 +16,6 @@
 #include "http_net.h"
 #include "socket_layer.h"
 #include "error.h"
-#include "imgfs.h"
 
 static int passive_socket = -1;
 static EventCallback cb;
@@ -34,7 +33,7 @@ MK_OUR_ERR(ERR_IO);
  *
  * @param ptr The pointer to free
  */
-void safe_free(void* ptr)
+void safe_free_(void* ptr)
 {
     if (ptr != NULL ) {
         free(ptr);
@@ -48,7 +47,8 @@ void safe_free(void* ptr)
  * @param arg The argument passed to the thread (client file descriptor).
  * @return The error code on failure, or success code on completion.
  */
-static void *handle_connection(void *arg){
+static void *handle_connection(void *arg)
+{
 
     //Argument validity check
     if (arg == NULL) return &our_ERR_INVALID_ARGUMENT;
@@ -75,7 +75,7 @@ static void *handle_connection(void *arg){
     char *rcvbuf = calloc(1,max_buff_sz);
 
     if (rcvbuf == NULL) {
-        safe_free(arg);
+        safe_free_(arg);
         return &our_ERR_OUT_OF_MEMORY;
     }
 
@@ -88,7 +88,7 @@ static void *handle_connection(void *arg){
                                       max_buff_sz - read_bytes - 1);
 
             if (num_bytes_read < 0) {
-                safe_free(rcvbuf);
+                safe_free_(rcvbuf);
                 return &our_ERR_IO;
             }
             read_bytes += num_bytes_read;
@@ -99,7 +99,7 @@ static void *handle_connection(void *arg){
 
             //Error in parsing
             if (parse_result < 0) {
-                safe_free(rcvbuf);
+                safe_free_(rcvbuf);
                 return &our_ERR_IO;
             }
 
@@ -108,7 +108,7 @@ static void *handle_connection(void *arg){
                 max_buff_sz = MAX_HEADER_SIZE + content_len;
                 char *new_buf = realloc(rcvbuf, max_buff_sz);
                 if (!new_buf) {
-                    safe_free(rcvbuf);
+                    safe_free_(rcvbuf);
                     return &our_ERR_IO;
                 }
                 rcvbuf = new_buf;
@@ -121,7 +121,7 @@ static void *handle_connection(void *arg){
             if (cb) {
                 int callback_result = cb(&message, client_fd);
                 if (callback_result < 0) {
-                    safe_free(rcvbuf);
+                    safe_free_(rcvbuf);
                     return &our_ERR_IO;
                 }
             }
@@ -136,7 +136,7 @@ static void *handle_connection(void *arg){
 
     //Closing socket after use
     close(client_fd);
-    safe_free(arg);
+    safe_free_(arg);
 
     return &our_ERR_NONE;
 }
@@ -176,21 +176,21 @@ int http_receive(void)
 
     if (!active_socket) {
         // Memory allocation failed, return error
-        safe_free(active_socket);
+        safe_free_(active_socket);
         return ERR_OUT_OF_MEMORY;
     }
     //Connecting to socket with tcp_accept
     *active_socket = tcp_accept(passive_socket);
 
     if (*active_socket < 0) {
-        safe_free(active_socket);
+        safe_free_(active_socket);
         return ERR_IO;
     }
 
     //Initializing the thread attributes
     ret = pthread_attr_init(&thread);
     if (ret) {
-        safe_free(active_socket);
+        safe_free_(active_socket);
         return ERR_IO;
     }
 
@@ -208,7 +208,7 @@ int http_receive(void)
 
     if (ret) {
         pthread_attr_destroy(&thread);
-        safe_free(active_socket);
+        safe_free_(active_socket);
         return ERR_IO;
     }
 
@@ -266,7 +266,7 @@ int http_serve_file(int connection, const char* filename)
                                 buffer, file_size);
 
     fclose(file);
-    safe_free(buffer);
+    safe_free_(buffer);
     return ret;
 }
 
@@ -298,7 +298,7 @@ int http_reply(int connection, const char* status, const char* headers, const ch
                               HTTP_PROTOCOL_ID, status, HTTP_LINE_DELIM, headers, body_len, HTTP_HDR_END_DELIM);
 
     if (header_len < 0 || (size_t)header_len >= max_total_size + 1) {
-        safe_free(buffer);
+        safe_free_(buffer);
         return ERR_RUNTIME;
     }
 
@@ -310,6 +310,6 @@ int http_reply(int connection, const char* status, const char* headers, const ch
     size_t total_len = header_len + body_len;
     size_t sent_len = tcp_send(connection, buffer, total_len);
 
-    safe_free(buffer);
+    safe_free_(buffer);
     return (sent_len == total_len) ? ERR_NONE : ERR_IO;
 }

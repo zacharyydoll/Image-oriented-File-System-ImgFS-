@@ -52,7 +52,7 @@ static int read_disk_image(const char *path, char **image_buffer, uint32_t *imag
  *
  * @param ptr The pointer to free
  */
-void safe_free(void* ptr)
+void safe_Free(void* ptr)
 {
     if (ptr != NULL ) {
         free(ptr);
@@ -315,8 +315,8 @@ int do_read_cmd(int argc, char **argv)
     create_name(img_id, resolution, &tmp_name);
     if (tmp_name == NULL) return ERR_OUT_OF_MEMORY;
     error = write_disk_image(tmp_name, image_buffer, image_size);
-    safe_free(tmp_name);
-    safe_free(image_buffer);
+    safe_Free(tmp_name);
+    safe_Free(image_buffer);
 
     return error;
 }
@@ -346,7 +346,7 @@ int do_insert_cmd(int argc, char **argv)
     }
 
     error = do_insert(image_buffer, image_size, argv[1], &imgfsFile);
-    safe_free(image_buffer);
+    safe_Free(image_buffer);
     do_close(&imgfsFile);
     return error;
 }
@@ -446,7 +446,7 @@ static int read_disk_image(const char *path, char **image_buffer, uint32_t *imag
     fclose(file);
 
     if (read != *image_size) {
-        safe_free(*image_buffer);
+        safe_Free(*image_buffer);
         return ERR_IO;
     }
 

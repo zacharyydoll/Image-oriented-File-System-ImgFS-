@@ -3,18 +3,7 @@
 #include <stdlib.h> // for malloc
 #include "error.h"
 
-/**
- * @brief Helper function to safely free pointers.
- *
- * @param ptr The pointer to free
- */
-void safe_free(void* ptr)
-{
-    if (ptr != NULL ) {
-        free(ptr);
-        ptr = NULL;
-    }
-}
+
 /**
  * @brief Checks whether the `message` URI starts with the provided `target_uri`.
  *
@@ -84,7 +73,8 @@ int http_get_var(const struct http_string *url, const char *name, char *out, siz
     //find parameter position in URL
     char *start = strstr(url->val, param_eq);
     if (!start) {
-        safe_free(param_eq);
+        free(param_eq);
+        param_eq = NULL;
         return 0; // parameter not found in URL -> return 0 (handout)
     }
 
@@ -96,14 +86,16 @@ int http_get_var(const struct http_string *url, const char *name, char *out, siz
 
     size_t value_length = end - start;
     if (value_length >= out_len) {
-        safe_free(param_eq);
+        free(param_eq);
+        param_eq = NULL;
         return ERR_RUNTIME;
     }
 
     strncpy(out, start, value_length);
     out[value_length] = '\0';
 
-    safe_free(param_eq);
+    free(param_eq);
+    param_eq = NULL;
     return value_length;
 }
 
