@@ -1,0 +1,31 @@
+/home/ryang/cs202/cs202-24-fuzz-corpus/working/dedup-crashes/crash-67591c518f48f72519cdf54006bf38606d0c1fc4
+
+(process:3444747): GLib-CRITICAL **: 21:18:19.249: g_hash_table_lookup: assertion 'hash_table != NULL' failed
+ERROR: I/O Error
+
+(process:3444747): GLib-CRITICAL **: 21:18:19.267: g_hash_table_lookup: assertion 'hash_table != NULL' failed
+ERROR: I/O Error
+
+=================================================================
+==3444747==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 82234 byte(s) in 1 object(s) allocated from:
+    #0 0x55b064e4bde8 in __interceptor_calloc (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0xfcde8) (BuildId: 7fe87ee24b48c4c44a8a05ea679b60707d564d6f)
+    #1 0x55b064e9a53b in lazily_resize /home/ryang/cs202/cs202-24-fuzz-corpus/projects/cs202-24-prj-sophie-zac/./done/image_content.c:51:31
+    #2 0x55b064eb29cf in do_read /home/ryang/cs202/cs202-24-fuzz-corpus/projects/cs202-24-prj-sophie-zac/./done/imgfs_read.c:34:30
+    #3 0x55b064ea432f in do_read_cmd /home/ryang/cs202/cs202-24-fuzz-corpus/projects/cs202-24-prj-sophie-zac/./done/imgfscmd_functions.c:306:13
+    #4 0x55b064ea08e2 in fuzz_main /home/ryang/cs202/cs202-24-fuzz-corpus/projects/cs202-24-prj-sophie-zac/./done/imgfscmd.c:70:19
+    #5 0x55b064e8ec8a in LLVMFuzzerTestOneInput /home/ryang/cs202/cs202-24-fuzz-corpus/src/fuzz-target.c:106:13
+    #6 0x55b064daf583 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0x60583) (BuildId: 7fe87ee24b48c4c44a8a05ea679b60707d564d6f)
+    #7 0x55b064d992ff in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0x4a2ff) (BuildId: 7fe87ee24b48c4c44a8a05ea679b60707d564d6f)
+    #8 0x55b064d9f056 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0x50056) (BuildId: 7fe87ee24b48c4c44a8a05ea679b60707d564d6f)
+    #9 0x55b064dc8e72 in main (/home/ryang/cs202/cs202-24-fuzz-corpus/working/build/cs202-24-prj-sophie-zac/fuzz-target+0x79e72) (BuildId: 7fe87ee24b48c4c44a8a05ea679b60707d564d6f)
+    #10 0x7f4638838d8f in __libc_start_call_main csu/../sysdeps/nptl/libc_start_call_main.h:58:16
+
+DEDUP_TOKEN: __interceptor_calloc--lazily_resize--do_read--do_read_cmd--fuzz_main--LLVMFuzzerTestOneInput--fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long)--fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long)--fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long))--main--__libc_start_call_main
+SUMMARY: AddressSanitizer: 82234 byte(s) leaked in 1 allocation(s).
+
+INFO: a leak has been found in the initial corpus.
+
+INFO: to ignore leaks on libFuzzer side use -detect_leaks=0.
+
