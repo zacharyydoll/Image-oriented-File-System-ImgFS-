@@ -52,12 +52,6 @@ In `tcp-test-server.c`:
 
 Helper function for cleaner code that receives a file over a TCP connection
 
-### General information
-
-- All steps of the project were fully completed and tested on a localhost webserver. 
-- Other than the aforementioned helper-functions, the code conception rigorously followed the provided handout.
-- Was very fun overall :)
-
 
 
 
