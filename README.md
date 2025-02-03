@@ -2,6 +2,8 @@
 ## Project description
 ImgFS is a project designed to develop a large program in C that focuses on system-level programming. The project involved creating a command-line utility to manage images, inspired by Facebook's "Haystack" system.
 
+This project was developed as part of **CS202: Computer Systems** at **École Polytechnique Fédérale de Lausanne (EPFL)**.
+
 ##### project web page: https://projprogsys-epfl.github.io/project/mainprj/01-main/
 ## Required Libraries
 
